@@ -46,11 +46,15 @@ export const AuthProvider = ({ children }) => {
           });
         }
       } else {
+        // Explicitly clear local state on logout
+        setUser(null);
+        setUserProfile(null);
+        
         // Automatically sign in anonymously if no user is found
         try {
           await signInAnonymously(auth);
         } catch (error) {
-          console.error("Auth Failed:", error);
+          console.error("Auth Failed (Anonymous Auth might be disabled in Firebase Console):", error);
         }
       }
       setLoading(false);
