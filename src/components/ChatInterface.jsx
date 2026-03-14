@@ -2,7 +2,7 @@ import { ArrowLeft, Phone, Video, MoreVertical, Send, Smile, Paperclip } from 'l
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from "../context/AuthContext";
 import { db } from "../services/config";
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, increment } from 'firebase/firestore';
 
 export default function ChatInterface({ chat, onClose }) {
   const { userProfile } = useAuth();
@@ -56,6 +56,7 @@ export default function ChatInterface({ chat, onClose }) {
       await updateDoc(doc(db, 'chats', chat.id), {
         lastMessage: messageText,
         lastMessageTime: serverTimestamp(),
+        unreadCount: increment(1)
       });
     } catch (error) {
        console.error("Error sending message", error);
