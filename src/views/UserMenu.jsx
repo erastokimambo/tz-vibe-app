@@ -2,7 +2,7 @@ import { User, Heart, Calendar, PlusSquare, Settings, LogOut, LogIn, ShieldCheck
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { db, auth } from '../firebase/config';
 
@@ -42,9 +42,9 @@ export default function UserMenu() {
     if (!newName.trim() || !userProfile?.uid) return;
     setIsSaving(true);
     try {
-      await updateDoc(doc(db, 'users', userProfile.uid), {
+      await setDoc(doc(db, 'users', userProfile.uid), {
         displayName: newName.trim()
-      });
+      }, { merge: true });
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
