@@ -50,13 +50,10 @@ export default function Footer() {
           
         </div>
         
-        <div className="border-t border-gray-200 dark:border-[#38000A] mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-500 dark:text-gray-500 text-sm">
-            © {new Date().getFullYear()} TzVibe Group. All rights reserved.
+        <div className="border-t border-gray-200 dark:border-[#38000A] mt-16 pt-8 flex flex-col items-center text-center gap-4">
+          <p className="text-gray-500 dark:text-gray-500 text-sm font-medium tracking-wide">
+            © 2026 TzVibe. All Rights Reserved. Built for Dar es Salaam & Arusha.
           </p>
-          <div className="flex gap-4">
-            <span className="text-sm font-semibold text-gray-400">Dar es Salaam, TZ</span>
-          </div>
         </div>
       </div>
     </footer>

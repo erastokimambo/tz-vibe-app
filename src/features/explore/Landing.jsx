@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Mail, Phone, Compass, Users, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { db } from "../../services/config";
 import { collection, onSnapshot } from 'firebase/firestore';
@@ -129,6 +129,75 @@ export default function Landing() {
              </div>
           )}
         </section>
+
+        {/* 4. ABOUT US SECTION */}
+        <section className="py-24 px-6 relative bg-gradient-to-b from-[#38000A] to-[#1a0005]">
+          <div className="max-w-4xl mx-auto text-center space-y-16">
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">The Pulse of Tanzania Nightlife</h2>
+              <p className="text-gray-300 md:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+                TzVibe was born to simplify how you experience the night. From the hottest clubs in Dar to the most exclusive garden weddings in Arusha, we connect you to the best vibes in Tanzania.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+               <div className="bg-white/5 border border-white/10 backdrop-blur-md p-8 rounded-3xl flex flex-col items-center text-center hover:border-[#CD1C18]/50 transition-colors">
+                  <div className="w-14 h-14 bg-[#CD1C18]/10 rounded-2xl flex items-center justify-center text-[#CD1C18] mb-6">
+                     <Compass size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Discover</h3>
+                  <p className="text-gray-400 font-medium">Curated venues and hidden gems across the country.</p>
+               </div>
+               
+               <div className="bg-white/5 border border-white/10 backdrop-blur-md p-8 rounded-3xl flex flex-col items-center text-center hover:border-[#CD1C18]/50 transition-colors">
+                  <div className="w-14 h-14 bg-[#CD1C18]/10 rounded-2xl flex items-center justify-center text-[#CD1C18] mb-6">
+                     <Users size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Connect</h3>
+                  <p className="text-gray-400 font-medium">Follow your favorite DJs and track their live gigs tonight.</p>
+               </div>
+
+               <div className="bg-white/5 border border-white/10 backdrop-blur-md p-8 rounded-3xl flex flex-col items-center text-center hover:border-[#CD1C18]/50 transition-colors">
+                  <div className="w-14 h-14 bg-[#CD1C18]/10 rounded-2xl flex items-center justify-center text-[#CD1C18] mb-6">
+                     <Zap size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Simplify</h3>
+                  <p className="text-gray-400 font-medium">Instant RSVPs and direct Bolt rides to the venue.</p>
+               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. CONTACT SECTION */}
+        <section className="py-24 px-6 bg-[#1a0005]">
+          <div className="max-w-4xl mx-auto space-y-12">
+            <h2 className="text-3xl md:text-4xl font-black text-white text-center tracking-tight">Get in Touch</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <a 
+                 href="mailto:contact@tzvibe.co.tz"
+                 className="group bg-white/5 border border-white/10 backdrop-blur-xl p-8 rounded-3xl flex flex-col items-center justify-center text-center hover:bg-white/10 hover:border-[#CD1C18]/50 transition-all duration-300"
+               >
+                 <div className="w-16 h-16 bg-[#CD1C18] rounded-full flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <Mail size={32} />
+                 </div>
+                 <h3 className="text-xl font-bold text-white mb-2">Email Us</h3>
+                 <p className="text-gray-300 font-medium text-lg">contact@tzvibe.co.tz</p>
+               </a>
+
+               <a 
+                 href="https://wa.me/255652040391" target="_blank" rel="noopener noreferrer"
+                 className="group bg-[#25D366]/5 border border-[#25D366]/20 backdrop-blur-xl p-8 rounded-3xl flex flex-col items-center justify-center text-center hover:bg-[#25D366]/10 hover:border-[#25D366]/50 transition-all duration-300"
+               >
+                 <div className="w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(37,211,102,0.4)]">
+                    <Phone size={32} />
+                 </div>
+                 <h3 className="text-xl font-bold text-white mb-2">WhatsApp / Call</h3>
+                 <p className="text-gray-300 font-medium text-lg">+255 652 040 391</p>
+               </a>
+            </div>
+          </div>
+        </section>
+
       </main>
       <Footer />
 
