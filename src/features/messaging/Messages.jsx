@@ -14,7 +14,7 @@ export default function Messages() {
 
   useEffect(() => {
     if (!userProfile?.uid) {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 0);
       return;
     }
 
@@ -22,8 +22,8 @@ export default function Messages() {
     const chatsRef = collection(db, 'chats');
     const q = query(
       chatsRef,
-      where('participants', 'array-contains', userProfile.uid),
-      orderBy('lastUpdated', 'desc')
+      where('users', 'array-contains', userProfile.uid),
+      orderBy('lastMessageTime', 'desc')
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -68,23 +68,35 @@ export default function Messages() {
             <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#CD1C18] animate-spin mb-4" />
             Loading messages...
           </div>
-        ) : filteredChats.map((chat) => (
+        ) : filteredChats.map((chat) => {
+          // Determine "the other party" for display
+          const isMeUser = chat.userId === userProfile.uid;
+          const displayName = isMeUser ? chat.businessName : chat.userName;
+          const displayImage = isMeUser ? chat.businessImage : null; // Fallback to icon for users
+
+          return (
           <div 
             key={chat.id}
             onClick={() => setActiveChat(chat)}
             className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer active:bg-gray-100 dark:active:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-800/50"
           >
-            <img 
-              src={chat.businessImage || 'https://via.placeholder.com/150'} 
-              alt={chat.businessName || 'Business'} 
-              className="w-14 h-14 rounded-full object-cover bg-gray-200"
-            />
+            {displayImage ? (
+              <img 
+                src={displayImage} 
+                alt={displayName} 
+                className="w-14 h-14 rounded-full object-cover bg-gray-200"
+              />
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-xl text-gray-500">
+                 {displayName?.charAt(0) || '?'}
+              </div>
+            )}
             
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-baseline mb-1">
-                <h2 className="font-bold text-base truncate pr-2 dark:text-gray-100">{chat.businessName || 'Business Chat'}</h2>
+                <h2 className="font-bold text-base truncate pr-2 dark:text-gray-100">{displayName || 'Anonymous User'}</h2>
                 <span className={`text-xs whitespace-nowrap ${chat.unreadCount ? 'text-[#CD1C18] dark:text-[#FFA896] font-bold' : 'text-gray-400'}`}>
-                  {chat.lastMessageTime ? new Date(chat.lastMessageTime?.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                  {chat.lastMessageTime?.toDate ? new Date(chat.lastMessageTime.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -99,7 +111,7 @@ export default function Messages() {
               </div>
             </div>
           </div>
-        ))}
+        )})}
         {!loading && filteredChats.length === 0 && (
           <div className="p-12 text-center flex flex-col items-center">
              <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full mb-4">

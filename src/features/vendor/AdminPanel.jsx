@@ -12,7 +12,7 @@ export default function AdminPanel() {
 
   useEffect(() => {
     if (!userProfile?.isAdmin) {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 0);
       return;
     }
     const unsub = onSnapshot(collection(db, 'businesses'), (snap) => {

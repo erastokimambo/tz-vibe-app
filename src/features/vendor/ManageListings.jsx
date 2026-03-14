@@ -14,8 +14,10 @@ export default function ManageListings() {
 
   useEffect(() => {
     if (!userProfile?.uid) {
-      setLoading(false);
-      setLoadingBookings(false);
+      setTimeout(() => {
+        setLoading(false);
+        setLoadingBookings(false);
+      }, 0);
       return;
     }
     

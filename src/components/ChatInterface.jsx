@@ -62,6 +62,11 @@ export default function ChatInterface({ chat, onClose }) {
     }
   };
 
+  // Determine "the other party" for display
+  const isMeUser = chat?.userId === userProfile?.uid;
+  const displayName = isMeUser ? chat?.businessName : chat?.userName;
+  const displayImage = isMeUser ? chat?.businessImage : null;
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#E5DDD5] dark:bg-[#0B141A] animate-in slide-in-from-right duration-300">
       {/* Header */}
@@ -69,11 +74,20 @@ export default function ChatInterface({ chat, onClose }) {
         <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
           <ArrowLeft size={24} />
         </button>
-        <img src={chat.businessImage || 'https://via.placeholder.com/150'} alt={chat.businessName} className="w-10 h-10 rounded-full object-cover bg-gray-200" />
-        <div className="flex-1 min-w-0 pr-2">
-          <h2 className="font-bold text-base truncate leading-tight">{chat.businessName || 'Business'}</h2>
+
+        {displayImage ? (
+          <img src={displayImage} alt={displayName} className="w-10 h-10 rounded-full object-cover bg-gray-200 flex-none" />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-gray-600 flex flex-none items-center justify-center font-bold text-lg text-white">
+             {displayName?.charAt(0) || '?'}
+          </div>
+        )}
+
+        <div className="flex-1 min-w-0 px-2 lg:pr-2">
+          <h2 className="font-bold text-base truncate leading-tight">{displayName || 'Anonymous User'}</h2>
           <p className="text-white/70 text-xs truncate">online</p>
         </div>
+        
         <div className="flex items-center gap-1">
           <button className="p-2 hover:bg-white/10 rounded-full"><Video size={20} /></button>
           <button className="p-2 hover:bg-white/10 rounded-full"><Phone size={20} /></button>

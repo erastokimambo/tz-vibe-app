@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth, db } from "../../services/config";
+import { auth } from "../../services/config";
 import { 
   signInWithPopup, 
   GoogleAuthProvider, 
@@ -9,7 +9,6 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export default function Login() {
   const [authMethod, setAuthMethod] = useState('email'); // 'email' or 'phone'
@@ -28,7 +27,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleAuthResult = async (user) => {
+  const handleAuthResult = async () => {
     // AuthContext automatically handles creating the Firestore profile document in the background 
     // when the global onAuthStateChanged listener fires. 
     // We can instantly navigate the user into the app without waiting for database roundtrips.
@@ -71,7 +70,7 @@ export default function Login() {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
-        'callback': (response) => {
+        'callback': () => {
           // reCAPTCHA solved
         }
       });

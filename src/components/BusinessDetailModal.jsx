@@ -1,11 +1,13 @@
 import { X, MapPin, MessageCircle, Navigation, Heart, Share2, Star, Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
-import { doc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc } from 'firebase/firestore';
 import { db } from "../services/config";
 
 export default function BusinessDetailModal({ business, onClose }) {
   const { userProfile } = useAuth();
+  const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [newReviewText, setNewReviewText] = useState('');
@@ -159,6 +161,45 @@ export default function BusinessDetailModal({ business, onClose }) {
     }
   };
 
+  const handleMessage = async () => {
+    if (!userProfile) {
+      alert("Please log in to send a message.");
+      return;
+    }
+    
+    // We enforce 1:1 consistent chats: ID = [USER_UID]_[VENDOR_UID]
+    const vendorId = business.ownerId || business.id; // Fallback to business ID if owner not strictly bound
+    const chatId = `${userProfile.uid}_${vendorId}`;
+    
+    try {
+      // First, ensure the parent chat document exists so the Inbox can query it
+      const chatRef = doc(db, 'chats', chatId);
+      const chatSnap = await getDoc(chatRef);
+      
+      if (!chatSnap.exists()) {
+        await setDoc(chatRef, {
+           users: [userProfile.uid, vendorId],
+           userId: userProfile.uid,
+           vendorId: vendorId,
+           businessName: business.name,
+           businessImage: business.image || '',
+           userName: userProfile.displayName || "Anonymous Guest",
+           lastMessage: "Conversation started",
+           lastMessageTime: serverTimestamp(),
+           unreadCount: 0
+        });
+      }
+      
+      // Navigate to the inbox tab where the context will be open
+      onClose();
+      navigate('/messages');
+      
+    } catch (error) {
+      console.error("Error initializing chat", error);
+      alert("Unable to start chat. Check network connection.");
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col md:items-center md:justify-center bg-white dark:bg-[#38000A] md:bg-black/60 md:backdrop-blur-sm animate-in slide-in-from-bottom-full md:zoom-in-95 duration-300 p-0 md:p-6">
       <div className="flex flex-col md:flex-row w-full h-full md:h-full md:max-h-[85vh] md:max-w-5xl md:bg-white dark:md:bg-[#38000A] md:rounded-3xl md:shadow-2xl md:overflow-hidden relative">
@@ -299,7 +340,10 @@ export default function BusinessDetailModal({ business, onClose }) {
       {/* Fixed Bottom Action Bar */}
       <div className="fixed md:absolute bottom-0 left-0 right-0 md:left-1/2 p-4 bg-white/80 dark:bg-[#4a0d13]/90 backdrop-blur-lg border-t dark:border-gray-800 pb-safe md:pb-4 z-20">
         <div className="flex gap-2 w-full px-2">
-          <button className="flex-none p-3.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl font-semibold hover:bg-gray-200 transition">
+          <button 
+           onClick={handleMessage}
+           className="flex-none p-3.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+          >
             <MessageCircle size={22} />
           </button>
           <button 

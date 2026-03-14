@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Apple, Play, Compass } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

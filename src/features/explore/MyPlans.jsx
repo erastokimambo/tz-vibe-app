@@ -12,7 +12,9 @@ export default function MyPlans() {
 
   useEffect(() => {
     if (!userProfile?.uid) {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 0);
       return;
     }
     const q = query(

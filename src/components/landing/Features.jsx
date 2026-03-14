@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Search, MapPin, Flame, MessageCircle } from 'lucide-react';
 
 const features = [
