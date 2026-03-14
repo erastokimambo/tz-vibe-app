@@ -36,12 +36,15 @@ export default function TopNav() {
               `flex items-center justify-center p-3 rounded-2xl transition-all duration-300 ${
                 isActive
                   ? 'bg-[#CD1C18]/10 dark:bg-[#FFA896]/10 text-[#CD1C18] dark:text-[#FFA896]'
-                  : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  : item.label === 'Log In' 
+                    ? 'bg-[#CD1C18] text-white hover:bg-[#9B1313] mx-2 px-6' 
+                    : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`
             }
             title={item.label}
           >
             <item.icon size={22} className="shrink-0" />
+            {item.label === 'Log In' && <span className="ml-2 font-bold text-[14px]">{item.label}</span>}
           </NavLink>
         ))}
       </nav>

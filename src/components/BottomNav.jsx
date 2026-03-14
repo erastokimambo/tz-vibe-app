@@ -26,12 +26,21 @@ export default function BottomNav() {
             className={({ isActive }) =>
               clsx(
                 "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-                isActive ? "text-[#CD1C18]" : "text-gray-500 dark:text-gray-400 hover:text-[#9B1313] dark:hover:text-gray-200"
+                label === 'Log In' 
+                  ? "text-[#CD1C18] font-bold" // Distinct color for Log In not active
+                  : isActive 
+                    ? "text-[#CD1C18]" 
+                    : "text-gray-500 dark:text-gray-400 hover:text-[#9B1313] dark:hover:text-gray-200"
               )
             }
           >
-            <Icon size={24} />
-            <span className="text-[10px] font-medium">{label}</span>
+            <div className={clsx(
+                "p-1.5 rounded-xl flex items-center justify-center transition-colors",
+                label === 'Log In' ? "bg-[#CD1C18]/10 text-[#CD1C18]" : ""
+              )}>
+              <Icon size={22} className={label === 'Log In' ? 'ml-0.5' : ''} />
+            </div>
+            <span className={clsx("text-[10px]", label === 'Log In' ? "font-bold" : "font-medium")}>{label}</span>
           </NavLink>
         ))}
       </nav>
