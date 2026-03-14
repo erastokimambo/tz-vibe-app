@@ -9,14 +9,14 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen font-sans selection:bg-[#CD1C18] selection:text-white dark pb-16 md:pb-0 md:bg-gray-50 dark:md:bg-[#2A0007]">
+    <div className="min-h-screen font-sans selection:bg-[#CD1C18] selection:text-white dark pb-16 md:pb-0 bg-white dark:bg-[#38000A]">
       <TopNav />
       {/* 
-        On mobile: max-w-md, centered.
-        On desktop: pb-0, pt-[104px] (to clear header), centered
+        On mobile: pb-16 to clear bottom nav
+        On desktop: w-full, pt-20 to clear fixed TopNav
       */}
-      <main className="max-w-md md:max-w-6xl mx-auto w-full relative min-h-screen md:pt-[104px] md:pb-6 md:px-6">
-         <div className="md:bg-white dark:md:bg-[#38000A] md:rounded-3xl md:min-h-[calc(100vh-128px)] md:shadow-2xl md:overflow-hidden md:border dark:md:border-[#5e1a20] relative">
+      <main className="w-full relative min-h-screen md:pt-20">
+         <div className="w-full h-full relative">
             <Outlet />
          </div>
       </main>
