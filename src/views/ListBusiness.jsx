@@ -72,15 +72,17 @@ export default function ListBusiness() {
         createdAt: new Date().toISOString()
       };
 
-      // Push to live Firestore database
-      await addDoc(collection(db, 'businesses'), newBusiness);
+      // Push to live Firestore database in the background (no await)
+      addDoc(collection(db, 'businesses'), newBusiness).catch(err => {
+        console.error("Error adding document: ", err);
+      });
 
-      // Show success feedback
+      // Show instant success feedback and route home immediately
       setToast('✅ Business saved successfully!');
       setTimeout(() => {
         setToast(null);
-        navigate('/'); // Go back home to see it in Explore tab
-      }, 2000);
+        navigate('/'); // Go back home immediately
+      }, 500);
     } catch (err) {
       console.error("Error adding document: ", err);
       setToast('❌ Error saving business');
