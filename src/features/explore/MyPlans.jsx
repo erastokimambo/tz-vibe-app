@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, Navigation } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from "../../context/AuthContext";
@@ -29,13 +29,24 @@ export default function MyPlans() {
     return () => unsub();
   }, [userProfile]);
 
-  const getStatusColor = (status) => {
+  const getStatusBadge = (status) => {
     switch (status) {
-      case 'confirmed': return 'text-green-500 bg-green-50 dark:bg-green-900/20 border-green-200';
-      case 'checked-in': return 'text-purple-500 bg-purple-50 dark:bg-purple-900/20 border-purple-200';
-      case 'declined': return 'text-red-500 bg-red-50 dark:bg-red-900/20 border-red-200';
-      default: return 'text-orange-500 bg-orange-50 dark:bg-orange-900/20 border-orange-200';
+      case 'confirmed': 
+        return { text: 'Confirmed - See you there!', className: 'bg-green-500/20 text-green-400 border-green-500/30' };
+      case 'checked-in': 
+        return { text: 'Checked In', className: 'bg-purple-500/20 text-purple-400 border-purple-500/30' };
+      case 'declined': 
+        return { text: 'Declined - Venue is full', className: 'bg-red-500/20 text-red-400 border-red-500/30' };
+      default: 
+        return { text: 'Pending - Waiting for Venue', className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' };
     }
+  };
+
+  const handleRide = (businessName) => {
+    window.location.href = `bolt://request`;
+    setTimeout(() => {
+      window.open(`https://bolt.eu/`, '_blank');
+    }, 2000);
   };
 
   return (
@@ -51,35 +62,44 @@ export default function MyPlans() {
         {loading ? (
              <div className="text-center py-20 text-gray-500">Loading your plans...</div>
         ) : plans.length > 0 ? (
-          plans.map(plan => (
-            <div key={plan.id} className="bg-white dark:bg-[#4a0d13] p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60 relative animate-in fade-in slide-in-from-bottom-4">
-              <div className="flex justify-between items-start mb-3 border-b dark:border-gray-800/50 pb-3">
-                <div>
-                  <h3 className="font-black text-lg dark:text-white leading-tight">{plan.businessName}</h3>
-                  <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">
-                     {plan.bookingDate && plan.bookingTime 
-                       ? `${plan.bookingDate} at ${plan.bookingTime}` 
-                       : plan.timestamp?.toDate().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-                  </p>
-                </div>
-                <div className={`px-3 py-1 rounded-full border text-xs font-black uppercase tracking-widest ${getStatusColor(plan.status)}`}>
-                  {plan.status}
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-sm font-bold text-gray-700 dark:text-gray-300">
-                <div className="flex items-center gap-1.5 border min-w-16 justify-center dark:border-gray-700 bg-gray-50 dark:bg-gray-800 py-1.5 px-3 rounded-xl">
-                  Party of {plan.pax}
-                </div>
-              </div>
+          plans.map(plan => {
+            const badge = getStatusBadge(plan.status);
+            const timeDisplay = plan.bookingDate && plan.bookingTime 
+              ? `${plan.bookingDate} at ${plan.bookingTime}` 
+              : plan.timestamp?.toDate().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
-              {plan.status === 'declined' && plan.declineReason && (
-                <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30 text-sm font-medium text-red-700 dark:text-red-400 animate-in fade-in slide-in-from-top-2">
-                  <span className="font-bold uppercase text-[10px] tracking-widest block mb-1">Vendor Note</span>
-                  {plan.declineReason}
+            return (
+              <div key={plan.id} className="mb-4 p-5 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 dark:backdrop-blur-md shadow-sm relative animate-in fade-in slide-in-from-bottom-4">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="text-xl font-black text-gray-900 dark:text-[#FFA896] leading-tight">{plan.businessName}</h3>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badge.className}`}>
+                    {badge.text}
+                  </span>
                 </div>
-              )}
-            </div>
-          ))
+                
+                <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 font-medium flex items-center gap-2">
+                  <Calendar size={14} className="inline" /> {timeDisplay} <span className="mx-1">•</span> 👥 {plan.pax} Guests
+                </p>
+
+                {plan.status === 'declined' && plan.declineReason && (
+                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30 text-sm font-medium text-red-700 dark:text-red-400">
+                    <span className="font-bold uppercase text-[10px] tracking-widest block mb-1">Vendor Note</span>
+                    {plan.declineReason}
+                  </div>
+                )}
+
+                {/* Contextual Action: Only show Ride if Confirmed */}
+                {plan.status === 'confirmed' && (
+                  <button 
+                    onClick={() => handleRide(plan.businessName)}
+                    className="w-full bg-[#CD1C18] hover:bg-[#9B1313] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-[#CD1C18]/20 mt-2"
+                  >
+                    <Navigation size={18} /> Get a Ride to {plan.businessName}
+                  </button>
+                )}
+              </div>
+            );
+          })
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full mb-4">
