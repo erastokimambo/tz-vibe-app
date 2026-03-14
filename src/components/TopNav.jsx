@@ -1,5 +1,5 @@
 import { Search, MapPin, MessageCircle, Menu, Flame, LogIn } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 
 export default function TopNav() {
@@ -16,14 +16,14 @@ export default function TopNav() {
 
   return (
     <div className="hidden md:flex w-full h-20 fixed left-0 top-0 bg-white/90 dark:bg-[#38000A]/90 backdrop-blur-md border-b border-gray-100 dark:border-[#5e1a20] shadow-sm z-50 items-center px-8 justify-between">
-      <div className="flex items-center gap-3">
+      <Link to="/" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#CD1C18] to-[#9B1313] flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-[#CD1C18]/30">
           Tv
         </div>
         <h1 className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">
           TzVibe.
         </h1>
-      </div>
+      </Link>
       
       <nav className="flex items-center gap-2">
         {navItems.map((item) => (
