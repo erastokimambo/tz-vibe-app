@@ -18,23 +18,32 @@ export const AuthProvider = ({ children }) => {
       if (firebaseUser) {
         setUser(firebaseUser);
         
-        // Ensure a user document exists in Firestore
-        const userRef = doc(db, 'users', firebaseUser.uid);
-        const userSnap = await getDoc(userRef);
-        
-        if (!userSnap.exists()) {
-          // Create initial profile for new anonymous users
-          const initialProfile = {
+        try {
+          // Ensure a user document exists in Firestore
+          const userRef = doc(db, 'users', firebaseUser.uid);
+          const userSnap = await getDoc(userRef);
+          
+          if (!userSnap.exists()) {
+            // Create initial profile for new anonymous users
+            const initialProfile = {
+              uid: firebaseUser.uid,
+              displayName: firebaseUser.isAnonymous ? 'Anonymous Guest' : (firebaseUser.displayName || 'User'),
+              createdAt: new Date().toISOString(),
+              savedListings: [], // array of business IDs
+              isAdmin: false // for future admin panel rules
+            };
+            await setDoc(userRef, initialProfile);
+            setUserProfile(initialProfile);
+          } else {
+            setUserProfile(userSnap.data());
+          }
+        } catch (error) {
+          console.warn("Firestore offline. Using fallback auth profile.", error);
+          setUserProfile({
             uid: firebaseUser.uid,
-            displayName: 'Anonymous Guest',
-            createdAt: new Date().toISOString(),
-            savedListings: [], // array of business IDs
-            isAdmin: false // for future admin panel rules
-          };
-          await setDoc(userRef, initialProfile);
-          setUserProfile(initialProfile);
-        } else {
-          setUserProfile(userSnap.data());
+            displayName: firebaseUser.isAnonymous ? 'Anonymous Guest' : (firebaseUser.displayName || 'User'),
+            isAdmin: false
+          });
         }
       } else {
         // Automatically sign in anonymously if no user is found

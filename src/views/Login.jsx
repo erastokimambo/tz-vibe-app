@@ -29,19 +29,23 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleAuthResult = async (user) => {
-    const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
-    
-    // Create profile if it's the first time signing in via Google or Email
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        uid: user.uid,
-        displayName: user.displayName || 'New User',
-        email: user.email,
-        createdAt: new Date().toISOString(),
-        savedListings: [],
-        isAdmin: false
-      });
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      // Create profile if it's the first time signing in via Google or Email
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          uid: user.uid,
+          displayName: user.displayName || 'New User',
+          email: user.email || '',
+          createdAt: new Date().toISOString(),
+          savedListings: [],
+          isAdmin: false
+        });
+      }
+    } catch (e) {
+      console.warn("Firestore offline. Skipping profile creation.", e);
     }
     navigate('/'); // Route back to explore page after login
   };
