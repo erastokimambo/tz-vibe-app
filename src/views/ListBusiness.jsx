@@ -116,24 +116,24 @@ export default function ListBusiness() {
       <form onSubmit={handleSubmit} className="p-4 max-w-2xl mx-auto space-y-6">
         
         {/* Basic Info Container */}
-        <div className="bg-white dark:bg-[#4a0d13] p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 space-y-4">
-          <h2 className="text-xl font-bold mb-4 dark:text-white">Basic Info</h2>
+        <div className="bg-white/50 dark:bg-[#4a0d13] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60 space-y-6">
+          <h2 className="text-xl font-black tracking-tight mb-2 dark:text-white border-b border-gray-100 dark:border-gray-800/50 pb-4">Basic Details</h2>
           
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Business Name</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Business Name</label>
             <input 
               required type="text" name="name" value={formData.name} onChange={handleChange}
               placeholder="e.g. Elements Club"
-              className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium text-lg"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Category</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Category</label>
               <select 
                 name="category" value={formData.category} onChange={handleChange}
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none"
+                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium"
               >
                 <option>Bars & Clubs</option>
                 <option>DJs</option>
@@ -141,10 +141,10 @@ export default function ListBusiness() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Price Range</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Price Range</label>
               <select 
                 name="priceRange" value={formData.priceRange} onChange={handleChange}
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none"
+                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium text-center"
               >
                 <option>$</option>
                 <option>$$</option>
@@ -155,37 +155,37 @@ export default function ListBusiness() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Location / City</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Location / City</label>
             <input 
               required type="text" name="location" value={formData.location} onChange={handleChange}
               placeholder="e.g. Masaki, Dar es Salaam"
-              className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Description</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Description</label>
             <textarea 
               name="description" value={formData.description} onChange={handleChange}
-              placeholder="Tell us about the vibe..." rows="3"
-              className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] resize-none"
+              placeholder="Tell us about the vibe..." rows="4"
+              className="w-full bg-gray-50 dark:bg-[#38000A] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl py-4 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] resize-none font-medium leading-relaxed"
             />
           </div>
         </div>
 
         {/* Media & Links */}
-        <div className="bg-white dark:bg-[#4a0d13] p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 space-y-4">
-          <h2 className="text-xl font-bold mb-4 dark:text-white">Media & Links</h2>
+        <div className="bg-white/50 dark:bg-[#4a0d13] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60 space-y-6">
+          <h2 className="text-xl font-black tracking-tight mb-2 dark:text-white border-b border-gray-100 dark:border-gray-800/50 pb-4">Media & Links</h2>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Thumbnail Image URL</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Thumbnail Image URL</label>
             <input 
               required type="url" name="image" value={formData.image} onChange={handleChange}
               placeholder="https://images.unsplash.com/..."
-              className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium"
             />
             {formData.image && (
-              <div className="mt-3 relative w-full h-32 rounded-xl overflow-hidden bg-gray-200">
+              <div className="mt-4 relative w-full h-40 rounded-2xl overflow-hidden bg-gray-200 border-4 border-white dark:border-gray-800 shadow-xl">
                 <img src={formData.image} alt="Preview" className="w-full h-full object-cover" onError={(e) => e.target.style.display='none'} />
               </div>
             )}
@@ -193,44 +193,44 @@ export default function ListBusiness() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">WhatsApp / Phone</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">WhatsApp / Phone</label>
               <input 
                 type="tel" name="phone" value={formData.phone} onChange={handleChange}
                 placeholder="+255..."
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+                className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium"
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Instagram Handle</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Instagram Handle</label>
               <input 
                 type="text" name="instagram" value={formData.instagram} onChange={handleChange}
                 placeholder="@tzvibe"
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+                className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Menu Link URL (Optional)</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Menu Link URL (Optional)</label>
             <input 
               type="url" name="menuUrl" value={formData.menuUrl} onChange={handleChange}
               placeholder="https://..."
-              className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis"
             />
           </div>
         </div>
 
         {/* Mock Analytics properties */}
-        <div className="bg-white dark:bg-[#4a0d13] p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 space-y-4">
-          <h2 className="text-xl font-bold mb-4 dark:text-white">Attributes & Analytics</h2>
+        <div className="bg-white/50 dark:bg-[#4a0d13] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60 space-y-6">
+          <h2 className="text-xl font-black tracking-tight mb-2 dark:text-white border-b border-gray-100 dark:border-gray-800/50 pb-4">Attributes</h2>
           <div className="flex items-center justify-between mb-2">
-            <span className="font-bold dark:text-white">Admin: Verified Badge</span>
+            <span className="font-bold text-gray-700 dark:text-white">Admin: Verified Badge</span>
             <input 
               type="checkbox" name="isVerified" checked={formData.isVerified} onChange={handleChange}
-              className="w-6 h-6 text-[#CD1C18] rounded-md focus:ring-[#CD1C18] accent-[#CD1C18]"
+              className="w-6 h-6 text-[#CD1C18] rounded-md border-gray-300 focus:ring-[#CD1C18] accent-[#CD1C18]"
             />
           </div>
           {formData.category === 'DJs' && (
-            <div className="flex items-center justify-between mb-4 bg-[#CD1C18]/10 p-3 rounded-xl border border-[#CD1C18]/20">
+            <div className="flex items-center justify-between mb-4 bg-gradient-to-r from-red-50 to-pink-50 dark:from-[#38000A] dark:to-[#4a0d13] p-4 rounded-2xl border border-red-100 dark:border-[#CD1C18]/30 shadow-sm">
               <span className="font-bold text-[#CD1C18] dark:text-[#FFA896] flex items-center gap-2">Live Tonight?</span>
               <input 
                 type="checkbox" name="isLiveTonight" checked={formData.isLiveTonight} onChange={handleChange}
@@ -240,57 +240,63 @@ export default function ListBusiness() {
           )}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Rating (Out of 5)</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Initial Rating</label>
               <input 
                 type="number" step="0.1" max="5" name="rating" value={formData.rating} onChange={handleChange}
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] font-bold text-center"
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Trending Score</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Trending Score</label>
               <input 
                 type="number" name="trendingScore" value={formData.trendingScore} onChange={handleChange}
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] font-bold text-center"
               />
             </div>
           </div>
         </div>
 
         {/* Event List Maker */}
-        <div className="bg-white dark:bg-[#4a0d13] p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold dark:text-white">Upcoming Events</h2>
+        <div className="bg-white/50 dark:bg-[#4a0d13] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60">
+          <div className="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-gray-800/50 pb-4">
+            <h2 className="text-xl font-black tracking-tight dark:text-white">Upcoming Events</h2>
             <button 
               type="button" onClick={handleAddEvent}
-              className="bg-[#CD1C18]/10 text-[#CD1C18] dark:text-[#FFA896] hover:bg-[#CD1C18]/20 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 transition-colors"
+              className="bg-[#CD1C18]/10 text-[#CD1C18] dark:text-[#FFA896] hover:bg-[#CD1C18]/20 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors"
             >
               <Plus size={16} /> Add Event
             </button>
           </div>
 
           {formData.events.length === 0 ? (
-            <p className="text-sm text-gray-500 italic">No events recorded. Click "Add Event" to list one.</p>
+            <p className="text-sm font-medium text-gray-400 dark:text-gray-500 italic text-center py-6">No events recorded. Click "Add Event" to create one.</p>
           ) : (
             <div className="space-y-4">
               {formData.events.map((ev, index) => (
-                <div key={index} className="flex items-start gap-2 bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
-                  <div className="flex-1 space-y-3">
-                    <input 
-                      required type="text" placeholder="Event Name (e.g. Afrobeat Fridays)"
-                      value={ev.name} onChange={(e) => handleEventChange(index, 'name', e.target.value)}
-                      className="w-full bg-white dark:bg-gray-900 border-none text-sm rounded-lg py-2 px-3 outline-none focus:ring-1 focus:ring-[#CD1C18]"
-                    />
-                    <input 
-                      required type="text" placeholder="Date/Time (e.g. This Friday, 10 PM)"
-                      value={ev.date} onChange={(e) => handleEventChange(index, 'date', e.target.value)}
-                      className="w-full bg-white dark:bg-gray-900 border-none text-sm rounded-lg py-2 px-3 outline-none focus:ring-1 focus:ring-[#CD1C18]"
-                    />
+                <div key={index} className="flex items-start gap-4 p-4 rounded-2xl border-l-4 border-[#CD1C18] bg-white dark:bg-[#38000A] shadow-sm">
+                  <div className="flex-1 space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Event Name</label>
+                        <input 
+                        required type="text" placeholder="e.g. Afrobeat Fridays"
+                        value={ev.name} onChange={(e) => handleEventChange(index, 'name', e.target.value)}
+                        className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 font-bold text-gray-900 dark:text-white py-1 outline-none focus:border-[#CD1C18] placeholder-gray-300 dark:placeholder-gray-600"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Date & Time</label>
+                        <input 
+                        required type="text" placeholder="e.g. This Friday, 10 PM"
+                        value={ev.date} onChange={(e) => handleEventChange(index, 'date', e.target.value)}
+                        className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 font-medium text-gray-700 dark:text-gray-300 py-1 outline-none focus:border-[#CD1C18] placeholder-gray-300 dark:placeholder-gray-600"
+                        />
+                    </div>
                   </div>
                   <button 
                     type="button" onClick={() => handleRemoveEvent(index)}
-                    className="p-2 text-gray-400 hover:text-red-500 transition-colors bg-white dark:bg-gray-900 rounded-lg shadow-sm"
+                    className="p-3 text-gray-400 hover:text-white hover:bg-red-500 transition-colors bg-gray-50 dark:bg-gray-800 rounded-xl"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={18} />
                   </button>
                 </div>
               ))}
