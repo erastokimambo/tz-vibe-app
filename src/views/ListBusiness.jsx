@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, Trash2, GlassWater, Music, CalendarHeart, Utensils } from 'lucide-react';
-import { db } from '../firebase/config';
-import { collection, addDoc } from 'firebase/firestore';
+import { db, storage } from '../firebase/config';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../contexts/AuthContext';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -55,6 +56,8 @@ export default function ListBusiness() {
   });
 
   const [toast, setToast] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -62,6 +65,15 @@ export default function ListBusiness() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setFormData(prev => ({...prev, image: ''}));
+    }
   };
 
   const handleAddEvent = () => {
@@ -103,17 +115,44 @@ export default function ListBusiness() {
         createdAt: new Date().toISOString()
       };
 
-      // Push to live Firestore database in the background (no await)
-      addDoc(collection(db, 'businesses'), newBusiness).catch(err => {
-        console.error("Error adding document: ", err);
-      });
+      // Push to live Firestore database
+      const docRef = await addDoc(collection(db, 'businesses'), newBusiness);
 
-      // Show instant success feedback and route home immediately
-      setToast('✅ Business saved successfully!');
-      setTimeout(() => {
-        setToast(null);
-        navigate('/'); // Go back home immediately
-      }, 500);
+      // If a native file was uploaded, sync it to Firebase Storage and update the document
+      if (imageFile) {
+        setToast('Uploading image... 0%');
+        const storageRef = ref(storage, `businesses/${docRef.id}`);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+             setToast(`Uploading image... ${Math.round(progress)}%`);
+          },
+          (error) => {
+             console.error("Upload error", error);
+             setToast('❌ Error uploading image');
+             setTimeout(() => setToast(null), 3000);
+          },
+          async () => {
+             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+             await updateDoc(doc(db, 'businesses', docRef.id), { image: downloadURL });
+             setToast('✅ Business saved successfully!');
+             setTimeout(() => {
+               setToast(null);
+               navigate('/'); 
+             }, 1000);
+          }
+        );
+      } else {
+        // No native file, just standard save
+        setToast('✅ Business saved successfully!');
+        setTimeout(() => {
+          setToast(null);
+          navigate('/'); // Go back home immediately
+        }, 500);
+      }
+
     } catch (err) {
       console.error("Error adding document: ", err);
       setToast('❌ Error saving business');
@@ -297,17 +336,28 @@ export default function ListBusiness() {
           <h2 className="text-xl font-black tracking-tight mb-2 dark:text-white border-b border-gray-100 dark:border-gray-800/50 pb-4">Media & Links</h2>
 
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Thumbnail Image URL</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Thumbnail Image (Upload)</label>
             <input 
-              required type="url" name="image" value={formData.image} onChange={handleChange}
-              placeholder="https://images.unsplash.com/..."
-              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium"
+              type="file" accept="image/*" onChange={handleImageChange}
+              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors mb-4"
             />
-            {formData.image && (
-              <div className="mt-4 relative w-full h-40 rounded-2xl overflow-hidden bg-gray-200 border-4 border-white dark:border-gray-800 shadow-xl">
+            {imagePreview && (
+              <div className="mt-2 relative w-full h-40 rounded-2xl overflow-hidden bg-gray-200 border-4 border-white dark:border-gray-800 shadow-xl">
+                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+              </div>
+            )}
+            {!imagePreview && formData.image && (
+              <div className="mt-2 relative w-full h-40 rounded-2xl overflow-hidden bg-gray-200 border-4 border-white dark:border-gray-800 shadow-xl">
                 <img src={formData.image} alt="Preview" className="w-full h-full object-cover" onError={(e) => e.target.style.display='none'} />
               </div>
             )}
+            
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mt-6 mb-2">Or paste an Image URL manually</label>
+             <input 
+              type="url" name="image" value={formData.image} onChange={handleChange} disabled={!!imagePreview}
+              placeholder="https://images.unsplash.com/..."
+              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium disabled:opacity-30 disabled:cursor-not-allowed"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
