@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Secure the Messaging System
+    match /chats/{chatId} {
+      // Only users who are participants in the chat can read or write
+      allow read, write: if request.auth != null && request.auth.uid in resource.data.users;
+      
+      // Allow participants to write messages in the subcollection
+      match /messages/{messageId} {
+        allow read, write: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
+      }
+    }
+    
+    // Secure the Listings System
+    match /businesses/{businessId} {
+      // Anyone can read public listings
+      allow read: if true;
+      // Only logged in users can create a listing
+      allow create: if request.auth != null;
+      // Only the owner can update or delete their listing
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+    }
+    
+    // Secure the Bookings System (My additions to protect the new feature)
+    match /bookings/{bookingId} {
+      // Users can see their own bookings, Vendors can see bookings made to their venue
+      allow read: if request.auth != null && (request.auth.uid == resource.data.userId || request.auth.uid == resource.data.ownerId);
+      // Any authenticated user can create a booking request
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Only the Vendor (ownerId) can update the status of a booking
+      allow update: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      // Nobody can delete bookings (audit trail)
+      allow delete: if false;
+    }
+    
+    // Secure User Profiles
+    match /users/{userId} {
+      // Users can only read and write their own profile
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
