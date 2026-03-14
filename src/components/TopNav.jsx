@@ -3,7 +3,7 @@ import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 
 export default function TopNav() {
-  const { isGuest } = useAuth();
+  const { isGuest, userProfile } = useAuth();
 
   const navItems = [
     { icon: Search, label: 'Explore', path: '/', end: true },
@@ -11,7 +11,7 @@ export default function TopNav() {
     { icon: Flame, label: 'Trending', path: '/trending' },
     { icon: MessageCircle, label: 'Messages', path: '/messages' },
     ...(isGuest ? [{ icon: LogIn, label: 'Log In', path: '/login' }] : []),
-    { icon: Menu, label: 'My Menu', path: '/menu' },
+    { icon: Menu, label: 'Profile', path: '/menu', isProfile: true },
   ];
 
   return (
@@ -42,8 +42,19 @@ export default function TopNav() {
             }
             title={item.label}
           >
-            <item.icon size={22} className="shrink-0" />
-            {item.label === 'Log In' && <span className="ml-2 font-bold text-[14px]">{item.label}</span>}
+            {item.isProfile && !isGuest ? (
+              <div className="flex items-center gap-2 px-1">
+                <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">
+                  {userProfile?.displayName?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <span className="font-bold text-[14px]">{userProfile?.displayName?.split(' ')[0] || 'Profile'}</span>
+              </div>
+            ) : (
+              <>
+                <item.icon size={22} className="shrink-0" />
+                {item.label === 'Log In' && <span className="ml-2 font-bold text-[14px]">{item.label}</span>}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
