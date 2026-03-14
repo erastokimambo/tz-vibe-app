@@ -1,7 +1,16 @@
-import { X, MapPin, MessageCircle, Navigation } from 'lucide-react';
-import { useEffect } from 'react';
+import { X, MapPin, MessageCircle, Navigation, Heart, Share2, Star, Send } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { doc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 export default function BusinessDetailModal({ business, onClose }) {
+  const { userProfile } = useAuth();
+  const [isSaved, setIsSaved] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [newReviewText, setNewReviewText] = useState('');
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // Prevent scrolling on root when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -10,26 +19,118 @@ export default function BusinessDetailModal({ business, onClose }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (userProfile && business) {
+      setIsSaved(userProfile.savedListings?.includes(business.id) || false);
+    }
+  }, [userProfile, business]);
+
+  useEffect(() => {
+    if (!business?.id) return;
+    
+    // Listen to live reviews for this specific business
+    const reviewsRef = collection(db, `businesses/${business.id}/reviews`);
+    const q = query(reviewsRef, orderBy('createdAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const liveReviews = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setReviews(liveReviews);
+    });
+
+    return () => unsubscribe();
+  }, [business?.id]);
+
   if (!business) return null;
 
-  const { name, image, location, events = [], description = "Experience the best vibes in town." } = business;
+  const { id, name, image, location, events = [], description = "Experience the best vibes in town." } = business;
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Check out ${name} on TzVibe!`,
+          text: description,
+          url: `${window.location.origin}/app?business=${id}`,
+        });
+      }
+    } catch (error) {
+      console.log('Error sharing:', error);
+    }
+  };
+
+  const toggleSave = async () => {
+    if (!userProfile?.uid) return;
+    try {
+      const userRef = doc(db, 'users', userProfile.uid);
+      if (isSaved) {
+        await updateDoc(userRef, { savedListings: arrayRemove(id) });
+        setIsSaved(false);
+      } else {
+        await updateDoc(userRef, { savedListings: arrayUnion(id) });
+        setIsSaved(true);
+      }
+    } catch (error) {
+      console.error("Error saving listing:", error);
+    }
+  };
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!newReviewText.trim() || !userProfile) return;
+    
+    setIsSubmitting(true);
+    try {
+      const reviewsRef = collection(db, `businesses/${id}/reviews`);
+      await addDoc(reviewsRef, {
+        userId: userProfile.uid,
+        userName: userProfile.displayName,
+        rating: newReviewRating,
+        text: newReviewText.trim(),
+        createdAt: serverTimestamp()
+      });
+      setNewReviewText('');
+      setNewReviewRating(5);
+    } catch (error) {
+      console.error("Error submitting review: ", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-white dark:bg-[#38000A] animate-in slide-in-from-bottom-full duration-300">
-      {/* Header Image */}
-      <div className="relative w-full h-[40vh] bg-gray-200">
+    <div className="fixed inset-0 z-[100] flex flex-col md:items-center md:justify-center bg-white dark:bg-[#38000A] md:bg-black/60 md:backdrop-blur-sm animate-in slide-in-from-bottom-full md:zoom-in-95 duration-300 p-0 md:p-6">
+      <div className="flex flex-col md:flex-row w-full h-full md:h-full md:max-h-[85vh] md:max-w-5xl md:bg-white dark:md:bg-[#38000A] md:rounded-3xl md:shadow-2xl md:overflow-hidden relative">
+        {/* Header Image */}
+        <div className="relative w-full h-[40vh] md:w-1/2 md:h-full bg-gray-200 shrink-0">
         <img src={image} alt={name} className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
         <button 
           onClick={onClose}
-          className="absolute top-safe-12 left-4 p-2 bg-black/40 backdrop-blur-md rounded-full text-white"
+          className="absolute top-safe-12 left-4 p-2 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition"
         >
           <X size={24} />
         </button>
+        <div className="absolute top-safe-12 right-4 flex gap-2">
+          <button 
+            onClick={handleShare}
+            className="p-2 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition"
+          >
+            <Share2 size={24} />
+          </button>
+          <button 
+            onClick={toggleSave}
+            className="p-2 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition"
+          >
+            <Heart size={24} className={isSaved ? "fill-[#CD1C18] text-[#CD1C18]" : ""} />
+          </button>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-24 -mt-6 bg-white dark:bg-[#38000A] rounded-t-3xl relative z-10 p-6">
+      <div className="flex-1 overflow-y-auto pb-24 md:pb-24 -mt-6 md:mt-0 bg-white dark:bg-[#38000A] rounded-t-3xl md:rounded-none relative z-10 p-6 md:w-1/2">
         <h1 className="text-3xl font-bold mb-2">{name}</h1>
         <div className="flex items-center gap-2 text-gray-500 mb-6">
           <MapPin size={18} />
@@ -49,8 +150,11 @@ export default function BusinessDetailModal({ business, onClose }) {
                 <div key={idx} className="flex-none w-64 snap-center p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border dark:border-gray-700">
                   <h3 className="font-bold mb-1">{ev.name}</h3>
                   <p className="text-sm text-gray-500 mb-3">{ev.date}</p>
-                  <button className="w-full py-2 bg-[#CD1C18] text-white rounded-xl font-semibold text-sm">
-                    RSVP
+                  <button 
+                    onClick={() => alert(`RSVP successful for ${ev.name}!`)}
+                    className="w-full py-2 bg-[#CD1C18] hover:bg-[#9B1313] transition-colors text-white rounded-xl font-semibold text-sm"
+                  >
+                    RSVP Now
                   </button>
                 </div>
               ))}
@@ -58,32 +162,82 @@ export default function BusinessDetailModal({ business, onClose }) {
           </div>
         )}
 
-        {/* Reviews Section Mock */}
-        <div>
-          <h2 className="text-xl font-bold mb-4">Reviews</h2>
-          <div className="flex flex-col gap-4">
-            <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border dark:border-gray-700">
-              <div className="font-bold">John Doe</div>
-              <div className="text-yellow-500 text-sm mb-2">★★★★★</div>
-              <p className="text-sm dark:text-gray-300">Amazing place, music was top notch.</p>
+        {/* Reviews Section Live */}
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4">Reviews & Vibes</h2>
+          
+          {/* Write Review Form */}
+          <form onSubmit={submitReview} className="mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border dark:border-gray-800">
+            <div className="flex items-center gap-1 mb-3">
+              {[1, 2, 3, 4, 5].map(star => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setNewReviewRating(star)}
+                  className="focus:outline-none transition-transform hover:scale-110"
+                >
+                  <Star size={24} className={newReviewRating >= star ? "fill-yellow-500 text-yellow-500" : "text-gray-300 dark:text-gray-600"} />
+                </button>
+              ))}
             </div>
+            <div className="flex items-end gap-2">
+              <textarea 
+                value={newReviewText}
+                onChange={(e) => setNewReviewText(e.target.value)}
+                placeholder="Share your experience..."
+                readOnly={isSubmitting}
+                className="flex-1 bg-white dark:bg-gray-900 border dark:border-gray-700 text-sm rounded-xl py-3 px-3 outline-none focus:ring-1 focus:ring-[#CD1C18] resize-none h-12"
+              />
+              <button 
+                type="submit"
+                disabled={!newReviewText.trim() || isSubmitting}
+                className="p-3.5 bg-[#CD1C18] disabled:opacity-50 text-white rounded-xl font-bold flex-none transition"
+              >
+                {isSubmitting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send size={18} />}
+              </button>
+            </div>
+          </form>
+
+          {/* Review List */}
+          <div className="flex flex-col gap-4">
+            {reviews.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 text-sm bg-gray-50 dark:bg-gray-800/20 rounded-2xl border border-dashed dark:border-gray-800">
+                No reviews yet. Be the first to share the vibe!
+              </div>
+            ) : (
+              reviews.map((rev) => (
+                <div key={rev.id} className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-bold text-sm">{rev.userName}</div>
+                    <div className="flex items-center text-yellow-500">
+                      <Star size={12} className="fill-yellow-500 mr-1" />
+                      <span className="text-xs font-bold">{rev.rating}</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {rev.text}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
 
       {/* Fixed Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-[#4a0d13]/90 backdrop-blur-lg border-t dark:border-gray-800 pb-safe">
-        <div className="flex gap-2 max-w-md mx-auto">
-          <button className="flex-none p-3.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl font-semibold">
+      <div className="fixed md:absolute bottom-0 left-0 right-0 md:left-1/2 p-4 bg-white/80 dark:bg-[#4a0d13]/90 backdrop-blur-lg border-t dark:border-gray-800 pb-safe md:pb-4 z-20">
+        <div className="flex gap-2 w-full px-2">
+          <button className="flex-none p-3.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl font-semibold hover:bg-gray-200 transition">
             <MessageCircle size={22} />
           </button>
-          <button className="flex-1 py-3.5 bg-black dark:bg-gray-700 text-white rounded-xl font-bold">
+          <button className="flex-1 py-3.5 bg-black dark:bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition">
             Book Table
           </button>
-          <button className="flex-1 py-3.5 bg-[#CD1C18] text-white rounded-xl font-bold flex items-center justify-center gap-2">
+          <button className="flex-1 py-3.5 bg-[#CD1C18] hover:bg-[#9B1313] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition">
             <Navigation size={18} /> Ride
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

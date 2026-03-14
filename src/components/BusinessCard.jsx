@@ -42,8 +42,13 @@ export default function BusinessCard({ business, onClick }) {
           <span className="bg-black/50 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/20 uppercase tracking-wide">
             {category}
           </span>
+          {business.isLiveTonight && (
+            <span className="flex items-center gap-1 bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-yellow-500/50 animate-pulse">
+              Live Tonight
+            </span>
+          )}
           {hasEvents && (
-            <span className="flex items-center gap-1 bg-[#CD1C18] text-white text-xs font-bold px-3 py-1 rounded-full animate-bounce">
+            <span className="flex items-center gap-1 bg-[#CD1C18] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
               <CalendarDays size={14} />
               Upcoming Event
             </span>

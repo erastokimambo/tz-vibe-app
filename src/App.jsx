@@ -1,30 +1,24 @@
 import { Outlet } from 'react-router-dom';
 import BottomNav from './components/BottomNav';
-import { useState, useEffect } from 'react';
+import TopNav from './components/TopNav';
+import { useEffect } from 'react';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
-
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
+    document.documentElement.classList.add('dark');
+  }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#38000A] text-black dark:text-white transition-colors duration-200 pb-16">
-      {/* Top utility for dark mode toggle (can be moved to Menu later) */}
-      <button 
-        onClick={() => setDarkMode(!darkMode)}
-        className="fixed top-2 right-2 z-50 p-2 bg-gray-100 dark:bg-gray-800 rounded-full shadow"
-      >
-        {darkMode ? '☀️' : '🌙'}
-      </button>
-
-      <main className="max-w-md mx-auto w-full relative min-h-screen">
-        <Outlet />
+    <div className="min-h-screen font-sans selection:bg-[#CD1C18] selection:text-white dark pb-16 md:pb-0 md:bg-gray-50 dark:md:bg-[#2A0007]">
+      <TopNav />
+      {/* 
+        On mobile: max-w-md, centered.
+        On desktop: pb-0, pt-[104px] (to clear header), centered
+      */}
+      <main className="max-w-md md:max-w-6xl mx-auto w-full relative min-h-screen md:pt-[104px] md:pb-6 md:px-6">
+         <div className="md:bg-white dark:md:bg-[#38000A] md:rounded-3xl md:min-h-[calc(100vh-128px)] md:shadow-2xl md:overflow-hidden md:border dark:md:border-[#5e1a20] relative">
+            <Outlet />
+         </div>
       </main>
 
       <BottomNav />

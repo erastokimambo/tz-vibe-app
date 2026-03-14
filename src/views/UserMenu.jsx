@@ -1,33 +1,63 @@
-import { User, Heart, Calendar, PlusSquare, Settings, LogOut, ShieldCheck, Moon, Sun } from 'lucide-react';
+import { User, Heart, Calendar, PlusSquare, Settings, LogOut, ShieldCheck, Moon, Sun, X, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 export default function UserMenu() {
-  const toggleTheme = () => {
-    document.documentElement.classList.toggle('dark');
-  };
+  const { userProfile, loading } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+
 
   const menuGroups = [
     {
       title: "My Activity",
       items: [
-        { icon: Calendar, label: "My Plans", bg: "bg-blue-500", link: null },
-        { icon: Heart, label: "Saved Listings", bg: "bg-pink-500", link: null },
+        { icon: Calendar, label: "My Plans", bg: "bg-blue-500", link: "/app/dashboard/plans" },
+        { icon: Heart, label: "Saved Listings", bg: "bg-pink-500", link: "/app/dashboard/saved" },
       ]
     },
     {
       title: "Business",
       items: [
-        { icon: PlusSquare, label: "Record Data / List Business", bg: "bg-green-500", link: "/list-business" },
-        { icon: Settings, label: "Manage Listings", bg: "bg-gray-600", link: null },
+        { icon: PlusSquare, label: "Record Data / List Business", bg: "bg-green-500", link: "/app/list-business" },
+        { icon: Settings, label: "Manage Listings", bg: "bg-gray-600", link: "/app/dashboard/manage" },
       ]
     },
-    {
+    ...(userProfile?.isAdmin ? [{
       title: "Settings & Admin",
       items: [
-        { icon: ShieldCheck, label: "Admin Panel", bg: "bg-purple-600", link: null },
+        { icon: ShieldCheck, label: "Admin Panel", bg: "bg-purple-600", link: "/app/admin" },
       ]
-    }
+    }] : [])
   ];
+
+  const handleSaveProfile = async () => {
+    if (!newName.trim() || !userProfile?.uid) return;
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'users', userProfile.uid), {
+        displayName: newName.trim()
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-[#38000A] p-4 pt-12 pb-24 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#CD1C18] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#38000A] p-4 pt-12 pb-24">
@@ -36,28 +66,27 @@ export default function UserMenu() {
       {/* Profile Card */}
       <div className="bg-white dark:bg-[#4a0d13] rounded-2xl p-4 shadow-sm mb-6 flex items-center justify-between border dark:border-gray-800">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-            <User size={32} className="text-gray-400" />
+          <div className="w-16 h-16 bg-gray-200 dark:bg-[#38000A] rounded-full flex flex-shrink-0 items-center justify-center border-2 border-[#CD1C18]">
+            <User size={32} className="text-[#CD1C18] dark:text-[#FFA896]" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold">Anonymous Guest</h2>
-            <p className="text-sm text-[#CD1C18] dark:text-[#FFA896] font-medium cursor-pointer">Edit Profile</p>
+          <div className="overflow-hidden">
+            <h2 className="text-xl font-bold truncate dark:text-white">
+              {userProfile?.displayName || 'Anonymous Guest'}
+            </h2>
+            <p 
+              onClick={() => {
+                setNewName(userProfile?.displayName || '');
+                setIsEditing(true);
+              }}
+              className="text-sm text-[#CD1C18] dark:text-[#FFA896] font-medium cursor-pointer hover:underline"
+            >
+              Edit Profile
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#4a0d13] rounded-2xl shadow-sm border dark:border-gray-800 overflow-hidden mb-6">
-        <div 
-          onClick={toggleTheme}
-          className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
-        >
-          <div className={`p-2 rounded-xl text-white bg-yellow-500 dark:bg-indigo-500`}>
-            <span className="dark:hidden"><Sun size={20} /></span>
-            <span className="hidden dark:inline"><Moon size={20} /></span>
-          </div>
-          <span className="font-semibold flex-1">Toggle Dark Mode</span>
-        </div>
-      </div>
+
 
       {/* Menu Groups */}
       {menuGroups.map((group, idx) => (
@@ -95,6 +124,51 @@ export default function UserMenu() {
           Sign Out
         </button>
       </div>
+
+      {/* Edit Profile Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#4a0d13] w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold dark:text-white">Edit Profile</h2>
+              <button 
+                onClick={() => setIsEditing(false)}
+                className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500 dark:text-gray-400 hover:text-red-500"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Display Name</label>
+                <input 
+                  type="text" 
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="Enter your name..."
+                  className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-4 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+                  autoFocus
+                />
+              </div>
+
+              <button 
+                onClick={handleSaveProfile}
+                disabled={isSaving || !newName.trim()}
+                className="w-full bg-[#CD1C18] hover:bg-[#9B1313] disabled:opacity-50 text-white rounded-xl py-4 font-bold flex items-center justify-center gap-2 transition-all mt-6"
+              >
+                {isSaving ? (
+                  <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                ) : (
+                  <>
+                    <Check size={20} /> Save Changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,11 +12,14 @@ export default function ListBusiness() {
     location: '',
     description: '',
     phone: '',
+    instagram: '',
     image: '',
     menuUrl: '',
+    priceRange: '$$',
     rating: 5.0,
     trendingScore: 50,
     isVerified: false,
+    isLiveTonight: false,
     hasEvents: false,
     events: []
   });
@@ -76,7 +79,7 @@ export default function ListBusiness() {
       setToast('✅ Business saved successfully!');
       setTimeout(() => {
         setToast(null);
-        navigate('/'); // Go back home to see it in Explore tab
+        navigate('/app'); // Go back home to see it in Explore tab
       }, 2000);
     } catch (err) {
       console.error("Error adding document: ", err);
@@ -125,20 +128,34 @@ export default function ListBusiness() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Category</label>
-            <select 
-              name="category" value={formData.category} onChange={handleChange}
-              className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none"
-            >
-              <option>Bars & Clubs</option>
-              <option>DJs</option>
-              <option>Wedding Venues</option>
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Category</label>
+              <select 
+                name="category" value={formData.category} onChange={handleChange}
+                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none"
+              >
+                <option>Bars & Clubs</option>
+                <option>DJs</option>
+                <option>Wedding Venues</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Price Range</label>
+              <select 
+                name="priceRange" value={formData.priceRange} onChange={handleChange}
+                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none"
+              >
+                <option>$</option>
+                <option>$$</option>
+                <option>$$$</option>
+                <option>$$$$</option>
+              </select>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Location</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Location / City</label>
             <input 
               required type="text" name="location" value={formData.location} onChange={handleChange}
               placeholder="e.g. Masaki, Dar es Salaam"
@@ -184,26 +201,43 @@ export default function ListBusiness() {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Menu Link URL</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Instagram Handle</label>
               <input 
-                type="url" name="menuUrl" value={formData.menuUrl} onChange={handleChange}
-                placeholder="https://..."
+                type="text" name="instagram" value={formData.instagram} onChange={handleChange}
+                placeholder="@tzvibe"
                 className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
               />
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Menu Link URL (Optional)</label>
+            <input 
+              type="url" name="menuUrl" value={formData.menuUrl} onChange={handleChange}
+              placeholder="https://..."
+              className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+            />
           </div>
         </div>
 
         {/* Mock Analytics properties */}
         <div className="bg-white dark:bg-[#4a0d13] p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 space-y-4">
           <h2 className="text-xl font-bold mb-4 dark:text-white">Attributes & Analytics</h2>
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-bold dark:text-white">Verified Badge</span>
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-bold dark:text-white">Admin: Verified Badge</span>
             <input 
               type="checkbox" name="isVerified" checked={formData.isVerified} onChange={handleChange}
-              className="w-6 h-6 text-[#CD1C18] rounded-md focus:ring-[#CD1C18]"
+              className="w-6 h-6 text-[#CD1C18] rounded-md focus:ring-[#CD1C18] accent-[#CD1C18]"
             />
           </div>
+          {formData.category === 'DJs' && (
+            <div className="flex items-center justify-between mb-4 bg-[#CD1C18]/10 p-3 rounded-xl border border-[#CD1C18]/20">
+              <span className="font-bold text-[#CD1C18] dark:text-[#FFA896] flex items-center gap-2">Live Tonight?</span>
+              <input 
+                type="checkbox" name="isLiveTonight" checked={formData.isLiveTonight} onChange={handleChange}
+                className="w-6 h-6 rounded-md accent-[#CD1C18]"
+              />
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Rating (Out of 5)</label>

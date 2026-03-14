@@ -17,9 +17,4 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Sign in anonymously on init
-signInAnonymously(auth).catch((error) => {
-  console.error("Anonymous sign-in failed:", error);
-});
-
 export { auth, db };

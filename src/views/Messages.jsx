@@ -1,33 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import ChatInterface from '../components/ChatInterface';
-
-const mockChats = [
-  {
-    id: '1',
-    businessName: 'Elements Club',
-    businessImage: 'https://images.unsplash.com/photo-1574096079513-d8259312b785?q=80&w=2000&auto=format&fit=crop',
-    lastMessage: 'Your table for 4 is confirmed for Friday.',
-    timestamp: '10:42 AM',
-    unread: 1,
-  },
-  {
-    id: '2',
-    businessName: 'DJ Spinny',
-    businessImage: 'https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?q=80&w=2000&auto=format&fit=crop',
-    lastMessage: 'Awesome, see you at the event!',
-    timestamp: 'Yesterday',
-    unread: 0,
-  }
-];
+import { useAuth } from '../contexts/AuthContext';
+import { db } from '../firebase/config';
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 
 export default function Messages() {
+  const { userProfile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeChat, setActiveChat] = useState(null);
+  const [chats, setChats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredChats = mockChats.filter(chat => 
-    chat.businessName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    if (!userProfile?.uid) {
+      setLoading(false);
+      return;
+    }
+
+    // Query chats where user is a participant
+    const chatsRef = collection(db, 'chats');
+    const q = query(
+      chatsRef,
+      where('participants', 'array-contains', userProfile.uid),
+      orderBy('lastUpdated', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const liveChats = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setChats(liveChats);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [userProfile]);
+
+  const filteredChats = chats.filter(chat => 
+    chat.businessName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    chat.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -50,41 +63,52 @@ export default function Messages() {
 
       {/* Chat List */}
       <div className="flex flex-col">
-        {filteredChats.map((chat) => (
+        {loading ? (
+          <div className="p-8 text-center text-gray-500 flex flex-col items-center">
+            <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#CD1C18] animate-spin mb-4" />
+            Loading messages...
+          </div>
+        ) : filteredChats.map((chat) => (
           <div 
             key={chat.id}
             onClick={() => setActiveChat(chat)}
             className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer active:bg-gray-100 dark:active:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-800/50"
           >
             <img 
-              src={chat.businessImage} 
-              alt={chat.businessName} 
-              className="w-14 h-14 rounded-full object-cover"
+              src={chat.businessImage || 'https://via.placeholder.com/150'} 
+              alt={chat.businessName || 'Business'} 
+              className="w-14 h-14 rounded-full object-cover bg-gray-200"
             />
             
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-baseline mb-1">
-                <h2 className="font-bold text-base truncate pr-2">{chat.businessName}</h2>
-                <span className={`text-xs whitespace-nowrap ${chat.unread ? 'text-[#CD1C18] dark:text-[#FFA896] font-bold' : 'text-gray-400'}`}>
-                  {chat.timestamp}
+                <h2 className="font-bold text-base truncate pr-2 dark:text-gray-100">{chat.businessName || 'Business Chat'}</h2>
+                <span className={`text-xs whitespace-nowrap ${chat.unreadCount ? 'text-[#CD1C18] dark:text-[#FFA896] font-bold' : 'text-gray-400'}`}>
+                  {chat.lastMessageTime ? new Date(chat.lastMessageTime?.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <p className={`text-sm truncate pr-2 ${chat.unread ? 'text-gray-900 dark:text-gray-100 font-semibold' : 'text-gray-500'}`}>
-                  {chat.lastMessage}
+                <p className={`text-sm truncate pr-2 ${chat.unreadCount ? 'text-gray-900 dark:text-gray-100 font-semibold' : 'text-gray-500'}`}>
+                  {chat.lastMessage || 'Start a conversation...'}
                 </p>
-                {chat.unread > 0 && (
+                {chat.unreadCount > 0 && (
                   <span className="flex items-center justify-center w-5 h-5 bg-[#CD1C18] text-white text-[10px] font-bold rounded-full flex-none">
-                    {chat.unread}
+                     {chat.unreadCount}
                   </span>
                 )}
               </div>
             </div>
           </div>
         ))}
-        {filteredChats.length === 0 && (
-          <div className="p-8 text-center text-gray-500">
-            No chats found.
+        {!loading && filteredChats.length === 0 && (
+          <div className="p-12 text-center flex flex-col items-center">
+             <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full mb-4">
+                <Search size={32} className="text-gray-400" />
+            </div>
+            <h3 className="text-xl font-bold dark:text-white mb-2">Inbox Empty</h3>
+            <p className="text-sm text-gray-500 max-w-[200px]">
+              You don't have any active vibes in your inbox. Check out the explore tab!
+            </p>
           </div>
         )}
       </div>
