@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* Custom Theme Setup */
+@theme {
+  --color-primary: #CD1C18;
+  --color-primary-hover: #9B1313;
+  --color-accent: #FFA896;
+  --color-dark-bg: #38000A;
+  --color-dark-surface: #4a0d13;
+}
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+  }
+  .dark {
+    --background: var(--color-dark-bg);
+    --foreground: #ffffff;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-gray-200 dark:border-gray-800;
+  }
+  body {
+    @apply bg-[var(--background)] text-[var(--foreground)] antialiased;
+  }
+}
