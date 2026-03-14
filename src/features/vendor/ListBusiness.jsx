@@ -57,13 +57,15 @@ export default function ListBusiness() {
     },
     hasEvents: false,
     events: [],
-    capacity: '',
-    setting: 'Indoor',
-    amenities: [],
-    pricingModel: 'Venue Rental Fee'
+    weddingDetails: {
+      maxCapacity: '',
+      venueType: 'Both',
+      amenities: [],
+      isCateringFlexible: false
+    }
   });
 
-  const availableAmenities = ['Parking', 'Bride Room', 'Generator', 'Kitchen', 'Catering', 'Sound System', 'Security'];
+  const availableAmenities = ['Generator', 'AC', 'Parking', 'Bride Room', 'Catering', 'Sound System', 'Security', 'Garden'];
 
   const [toast, setToast] = useState(null);
   const [imageFile, setImageFile] = useState(null);
@@ -72,13 +74,13 @@ export default function ListBusiness() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    // Handle nested liveStatus fields
-    if (name.startsWith('liveStatus.')) {
-      const field = name.split('.')[1];
+    // Handle nested liveStatus and weddingDetails fields
+    if (name.startsWith('liveStatus.') || name.startsWith('weddingDetails.')) {
+      const [parent, field] = name.split('.');
       setFormData(prev => ({
         ...prev,
-        liveStatus: {
-          ...prev.liveStatus,
+        [parent]: {
+          ...prev[parent],
           [field]: type === 'checkbox' ? checked : value
         }
       }));
@@ -92,12 +94,15 @@ export default function ListBusiness() {
 
   const handleAmenityToggle = (amenity) => {
     setFormData(prev => {
-      const isSelected = prev.amenities.includes(amenity);
+      const isSelected = prev.weddingDetails?.amenities.includes(amenity);
       return {
         ...prev,
-        amenities: isSelected 
-          ? prev.amenities.filter(a => a !== amenity)
-          : [...prev.amenities, amenity]
+        weddingDetails: {
+          ...prev.weddingDetails,
+          amenities: isSelected 
+            ? prev.weddingDetails.amenities.filter(a => a !== amenity)
+            : [...(prev.weddingDetails.amenities || []), amenity]
+        }
       };
     });
   };
@@ -176,12 +181,14 @@ export default function ListBusiness() {
            locationName: formData.liveStatus.locationName,
            expiresAt: expirationTimestamp
         },
-        // Wedding Venues Specific Schema
+        // Wedding Venues Specific Schema (Nested)
         ...(formData.category === 'Wedding Venues' && {
-           capacity: parseInt(formData.capacity) || 0,
-           setting: formData.setting,
-           amenities: formData.amenities,
-           pricingModel: formData.pricingModel
+           weddingDetails: {
+              maxCapacity: parseInt(formData.weddingDetails.maxCapacity) || 0,
+              venueType: formData.weddingDetails.venueType,
+              amenities: formData.weddingDetails.amenities,
+              isCateringFlexible: formData.weddingDetails.isCateringFlexible
+           }
         })
       };
 
@@ -408,16 +415,16 @@ export default function ListBusiness() {
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Capacity (Pax)</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Max Capacity (Pax)</label>
                 <input 
-                  type="number" required placeholder="e.g. 500" name="capacity" value={formData.capacity} onChange={handleChange}
+                  type="number" required placeholder="e.g. 500" name="weddingDetails.maxCapacity" value={formData.weddingDetails.maxCapacity} onChange={handleChange}
                   className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors font-medium text-center"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Setting</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Venue Type</label>
                 <select 
-                  name="setting" value={formData.setting} onChange={handleChange}
+                  name="weddingDetails.venueType" value={formData.weddingDetails.venueType} onChange={handleChange}
                   className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-2 px-3 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium text-center h-[42px]"
                 >
                   <option>Indoor</option>
@@ -427,15 +434,12 @@ export default function ListBusiness() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Pricing Model</label>
-              <select 
-                name="pricingModel" value={formData.pricingModel} onChange={handleChange}
-                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium"
-              >
-                <option>Venue Rental Fee</option>
-                <option>Per Plate / Package</option>
-              </select>
+            <div className="flex items-center justify-between mt-2 mb-4">
+              <span className="font-bold text-gray-700 dark:text-white">Outside Catering Flexible?</span>
+              <input 
+                type="checkbox" name="weddingDetails.isCateringFlexible" checked={formData.weddingDetails.isCateringFlexible} onChange={handleChange}
+                className="w-6 h-6 text-[#CD1C18] rounded-md border-gray-300 focus:ring-[#CD1C18] accent-[#CD1C18]"
+              />
             </div>
 
             <div>
@@ -447,7 +451,7 @@ export default function ListBusiness() {
                     key={amenity}
                     onClick={() => handleAmenityToggle(amenity)}
                     className={`px-4 py-2 rounded-xl text-sm font-bold transition ${
-                      formData.amenities.includes(amenity) 
+                      formData.weddingDetails?.amenities.includes(amenity) 
                         ? 'bg-[#CD1C18] text-white shadow-md' 
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}

@@ -1,4 +1,4 @@
-import { MapPin, Phone, Coffee, Star, BadgeCheck, CalendarDays, ExternalLink, Calendar, MessageCircle, Users } from 'lucide-react';
+import { MapPin, Phone, Coffee, Star, BadgeCheck, CalendarDays, ExternalLink, Calendar, MessageCircle, Users, Car, Wind, TreePine } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -107,6 +107,7 @@ export default function BusinessCard({ business, onClick }) {
 
   const renderButtons = () => {
     const isDJ = category && (category.includes('DJ') || category.toLowerCase().includes('djs'));
+    const isWedding = category === 'Wedding Venues';
     const hasRideLogic = location || business.logistics?.addressString || business.logistics?.coordinates;
 
     if (isDJ) {
@@ -124,6 +125,27 @@ export default function BusinessCard({ business, onClick }) {
           >
             <Calendar size={18} /> Schedule
           </button>
+        </>
+      );
+    }
+
+    if (isWedding) {
+      return (
+        <>
+          <button 
+            onClick={(e) => handleInitialAuthCheck(e, handleMessage)}
+            className="flex-1 flex items-center justify-center gap-2 bg-[#CD1C18] hover:bg-[#9B1313] min-h-[44px] rounded-xl font-bold transition shadow-lg shadow-[#CD1C18]/30"
+          >
+             <MessageCircle size={18} /> Check Availability
+          </button>
+          {hasRideLogic && (
+            <button 
+              onClick={(e) => handleAction(e, openRide)}
+              className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 min-h-[44px] rounded-xl font-semibold transition"
+            >
+              <MapPin size={18} /> Get Ride
+            </button>
+          )}
         </>
       );
     }
@@ -165,10 +187,10 @@ export default function BusinessCard({ business, onClick }) {
           <span className="bg-black/50 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/20 uppercase tracking-wide w-fit">
             {category}
           </span>
-          {category === 'Wedding Venues' && business.capacity ? (
+          {category === 'Wedding Venues' && business.weddingDetails?.maxCapacity ? (
             <span className="flex w-fit items-center gap-1 bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/30 backdrop-blur-md shadow-lg shadow-black/20">
               <Users size={14} />
-              {business.capacity}+ Pax
+              Up to {business.weddingDetails.maxCapacity} Guests
             </span>
           ) : business.liveStatus?.active && (!business.liveStatus.expiresAt || new Date() < new Date(business.liveStatus.expiresAt)) && (
             <span className="flex w-fit items-center gap-1 bg-[#CD1C18] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-[#CD1C18]/50 animate-pulse">
@@ -199,6 +221,15 @@ export default function BusinessCard({ business, onClick }) {
           <MapPin size={14} />
           <span>{location}</span>
         </div>
+
+        {/* Quick Icons for Wedding Venues */}
+        {category === 'Wedding Venues' && business.weddingDetails?.amenities?.length > 0 && (
+          <div className="flex gap-3 mb-4 text-xs font-semibold text-gray-300">
+             {business.weddingDetails.amenities.includes('Parking') && <span className="flex items-center gap-1"><Car size={14} /> Parking</span>}
+             {business.weddingDetails.amenities.includes('AC') && <span className="flex items-center gap-1"><Wind size={14} /> AC</span>}
+             {business.weddingDetails.amenities.includes('Garden') && <span className="flex items-center gap-1"><TreePine size={14} /> Garden</span>}
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex gap-2 mt-4">
