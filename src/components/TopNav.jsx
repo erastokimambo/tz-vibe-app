@@ -3,8 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function TopNav() {
-  const { user, userProfile } = useAuth();
-  const isGuest = userProfile?.displayName === 'Anonymous Guest' || user?.isAnonymous === true;
+  const { isGuest } = useAuth();
 
   const navItems = [
     { icon: Search, label: 'Explore', path: '/', end: true },

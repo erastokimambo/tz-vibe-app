@@ -7,14 +7,11 @@ import { signOut } from 'firebase/auth';
 import { db, auth } from '../firebase/config';
 
 export default function UserMenu() {
-  const { user, userProfile, loading } = useAuth();
+  const { userProfile, loading, isGuest } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
-
-  // If the user hasn't explicitly renamed themself and is an anonymous Firebase Auth session
-  const isGuest = userProfile?.displayName === 'Anonymous Guest' || user?.isAnonymous === true;
 
 
 
