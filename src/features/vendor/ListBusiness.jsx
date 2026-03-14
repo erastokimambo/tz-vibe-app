@@ -50,7 +50,11 @@ export default function ListBusiness() {
     rating: 5.0,
     trendingScore: 50,
     isVerified: false,
-    isLiveTonight: false,
+    liveStatus: {
+      active: false,
+      locationName: '',
+      expiresAt: '' // We will store this as a local string and convert to Timestamp on submit
+    },
     hasEvents: false,
     events: []
   });
@@ -61,10 +65,23 @@ export default function ListBusiness() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    
+    // Handle nested liveStatus fields
+    if (name.startsWith('liveStatus.')) {
+      const field = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        liveStatus: {
+          ...prev.liveStatus,
+          [field]: type === 'checkbox' ? checked : value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
   };
 
   const handleImageChange = (e) => {
@@ -106,13 +123,41 @@ export default function ListBusiness() {
     setToast('Saving to database...');
 
     try {
+      // Build Logistics and liveStatus schema properly
+      let expirationTimestamp = null;
+      if (formData.liveStatus.active && formData.liveStatus.expiresAt) {
+        expirationTimestamp = new Date(formData.liveStatus.expiresAt).toISOString();
+      }
+
       // Create new object
       const newBusiness = {
-        ...formData,
-        ownerId: userProfile?.uid || 'anonymous',
+        name: formData.name,
+        category: formData.category,
+        location: formData.location, // Kept for simple backwards compatibility
+        description: formData.description,
+        phone: formData.phone,
+        instagram: formData.instagram,
+        image: formData.image,
+        menuUrl: formData.menuUrl,
+        priceRange: formData.priceRange,
         rating: parseFloat(formData.rating) || 5.0,
         trendingScore: parseInt(formData.trendingScore) || 50,
-        createdAt: new Date().toISOString()
+        isVerified: formData.isVerified,
+        hasEvents: formData.hasEvents,
+        events: formData.events,
+        ownerId: userProfile?.uid || 'anonymous',
+        createdAt: new Date().toISOString(),
+        
+        // New Nested Schema
+        logistics: {
+           coordinates: formData.mapCoordinates ? { lat: formData.mapCoordinates.lat, lng: formData.mapCoordinates.lng } : null,
+           addressString: formData.location || formData.googleMapsUrl || ''
+        },
+        liveStatus: {
+           active: formData.liveStatus.active,
+           locationName: formData.liveStatus.locationName,
+           expiresAt: expirationTimestamp
+        }
       };
 
       // Push to live Firestore database
@@ -401,12 +446,35 @@ export default function ListBusiness() {
             />
           </div>
           {formData.category === 'DJs' && (
-            <div className="flex items-center justify-between mb-4 bg-gradient-to-r from-red-50 to-pink-50 dark:from-[#38000A] dark:to-[#4a0d13] p-4 rounded-2xl border border-red-100 dark:border-[#CD1C18]/30 shadow-sm">
-              <span className="font-bold text-[#CD1C18] dark:text-[#FFA896] flex items-center gap-2">Live Tonight?</span>
-              <input 
-                type="checkbox" name="isLiveTonight" checked={formData.isLiveTonight} onChange={handleChange}
-                className="w-6 h-6 rounded-md accent-[#CD1C18]"
-              />
+            <div className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-[#38000A] dark:to-[#4a0d13] p-4 rounded-2xl border border-red-100 dark:border-[#CD1C18]/30 shadow-sm mb-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#CD1C18] dark:text-[#FFA896] flex items-center gap-2">Live Tonight?</span>
+                <input 
+                  type="checkbox" name="liveStatus.active" checked={formData.liveStatus.active} onChange={handleChange}
+                  className="w-6 h-6 rounded-md accent-[#CD1C18]"
+                />
+              </div>
+              
+              {formData.liveStatus.active && (
+                <div className="space-y-4 pt-4 border-t border-red-200/50 dark:border-[#CD1C18]/20 animate-in fade-in slide-in-from-top-2">
+                  <div>
+                    <label className="block text-xs font-bold text-[#CD1C18]/70 dark:text-[#FFA896]/70 uppercase tracking-widest mb-2">Location Tonight</label>
+                    <input 
+                      required type="text" name="liveStatus.locationName" value={formData.liveStatus.locationName} onChange={handleChange}
+                      placeholder="e.g. Samaki Samaki Masaki"
+                      className="w-full bg-white/50 dark:bg-[#2A0008]/50 border-b-2 border-red-200 dark:border-[#CD1C18]/30 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-400 dark:placeholder-gray-600 font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#CD1C18]/70 dark:text-[#FFA896]/70 uppercase tracking-widest mb-2">Banner Expires At</label>
+                    <input 
+                      required type="datetime-local" name="liveStatus.expiresAt" value={formData.liveStatus.expiresAt} onChange={handleChange}
+                      className="w-full bg-white/50 dark:bg-[#2A0008]/50 border-b-2 border-red-200 dark:border-[#CD1C18]/30 text-gray-900 dark:text-white py-2 px-1 outline-none focus:border-[#CD1C18] transition-colors font-medium appearance-none"
+                    />
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest font-bold">The pulsing banner will automatically hide after this time.</p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <div className="grid grid-cols-2 gap-4">

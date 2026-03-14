@@ -11,6 +11,12 @@ export default function BusinessDetailModal({ business, onClose }) {
   const [newReviewText, setNewReviewText] = useState('');
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Booking State
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingPax, setBookingPax] = useState(2);
+  const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
+
   // Prevent scrolling on root when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -100,6 +106,35 @@ export default function BusinessDetailModal({ business, onClose }) {
     }
   };
 
+  const handleBooking = async () => {
+    if (!userProfile) {
+      alert("Please log in to book a table.");
+      return;
+    }
+
+    setIsBookingSubmitting(true);
+    try {
+      await addDoc(collection(db, 'bookings'), {
+        vendorId: business.id,
+        ownerId: business.ownerId || 'anonymous',
+        userId: userProfile.uid,
+        userName: userProfile.displayName || "Anonymous VIP",
+        userPhone: userProfile.phone || "",
+        businessName: business.name,
+        pax: bookingPax,
+        status: 'pending',
+        timestamp: serverTimestamp()
+      });
+      alert(`Booking requested for ${bookingPax} guests! The venue will confirm shortly.`);
+      setIsBookingOpen(false);
+    } catch (error) {
+      console.error("Error creating booking: ", error);
+      alert("Something went wrong requesting your booking. Please try again.");
+    } finally {
+      setIsBookingSubmitting(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col md:items-center md:justify-center bg-white dark:bg-[#38000A] md:bg-black/60 md:backdrop-blur-sm animate-in slide-in-from-bottom-full md:zoom-in-95 duration-300 p-0 md:p-6">
       <div className="flex flex-col md:flex-row w-full h-full md:h-full md:max-h-[85vh] md:max-w-5xl md:bg-white dark:md:bg-[#38000A] md:rounded-3xl md:shadow-2xl md:overflow-hidden relative">
@@ -134,8 +169,21 @@ export default function BusinessDetailModal({ business, onClose }) {
         <h1 className="text-3xl font-bold mb-2">{name}</h1>
         <div className="flex items-center gap-2 text-gray-500 mb-6">
           <MapPin size={18} />
-          <span>{location}</span>
+          <span>{business.logistics?.addressString || location}</span>
         </div>
+        
+        {business.liveStatus?.active && (!business.liveStatus.expiresAt || new Date() < new Date(business.liveStatus.expiresAt)) && (
+          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-red-50 to-pink-50 dark:from-[#38000A] dark:to-[#4a0d13] border border-red-100 dark:border-[#CD1C18]/30 flex items-center justify-between shadow-sm">
+            <div>
+              <span className="flex items-center gap-2 text-[#CD1C18] dark:text-[#FFA896] text-sm font-black uppercase tracking-widest mb-1">
+                 <span className="w-2 h-2 rounded-full bg-[#CD1C18] animate-ping" /> Live Tonight
+              </span>
+              {business.liveStatus.locationName && (
+                <p className="font-bold text-gray-900 dark:text-white text-lg">{business.liveStatus.locationName}</p>
+              )}
+            </div>
+          </div>
+        )}
         
         <p className="text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
           {description}
@@ -230,7 +278,10 @@ export default function BusinessDetailModal({ business, onClose }) {
           <button className="flex-none p-3.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl font-semibold hover:bg-gray-200 transition">
             <MessageCircle size={22} />
           </button>
-          <button className="flex-1 py-3.5 bg-black dark:bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition">
+          <button 
+            onClick={() => setIsBookingOpen(true)}
+            className="flex-1 py-3.5 bg-black dark:bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition"
+          >
             Book Table
           </button>
           <button className="flex-1 py-3.5 bg-[#CD1C18] hover:bg-[#9B1313] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition">
@@ -239,6 +290,53 @@ export default function BusinessDetailModal({ business, onClose }) {
         </div>
       </div>
       </div>
+
+      {/* Booking Sub-Modal Overlay */}
+      {isBookingOpen && (
+        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+          <div className="bg-white dark:bg-[#4a0d13] w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
+            <div className="flex justify-between items-center mb-6 border-b dark:border-gray-800 pb-4">
+              <div>
+                <h3 className="text-xl font-black dark:text-white">Reserve Table</h3>
+                <p className="text-sm font-bold text-[#CD1C18]">{business.name}</p>
+              </div>
+              <button onClick={() => setIsBookingOpen(false)} className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500 hover:bg-gray-200 transition">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="mb-8">
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">Party Size (Pax)</label>
+              <div className="flex items-center justify-center gap-6">
+                <button 
+                  onClick={() => setBookingPax(Math.max(1, bookingPax - 1))}
+                  className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center text-2xl font-bold text-gray-500 hover:border-[#CD1C18] hover:text-[#CD1C18] transition"
+                >-</button>
+                <span className="text-4xl font-black dark:text-white w-12 text-center">{bookingPax}</span>
+                <button 
+                  onClick={() => setBookingPax(Math.min(20, bookingPax + 1))}
+                  className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center text-2xl font-bold text-gray-500 hover:border-[#CD1C18] hover:text-[#CD1C18] transition"
+                >+</button>
+              </div>
+            </div>
+
+            <button 
+              onClick={handleBooking}
+              disabled={isBookingSubmitting}
+              className="w-full py-4 bg-[#CD1C18] hover:bg-[#9B1313] disabled:bg-gray-400 text-white rounded-2xl font-black text-lg shadow-lg flex items-center justify-center gap-2 transition"
+            >
+              {isBookingSubmitting ? (
+                <>
+                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                   Confirming...
+                </>
+              ) : (
+                'Request VIP Table'
+              )}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
