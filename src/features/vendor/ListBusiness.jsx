@@ -56,8 +56,14 @@ export default function ListBusiness() {
       expiresAt: '' // We will store this as a local string and convert to Timestamp on submit
     },
     hasEvents: false,
-    events: []
+    events: [],
+    capacity: '',
+    setting: 'Indoor',
+    amenities: [],
+    pricingModel: 'Venue Rental Fee'
   });
+
+  const availableAmenities = ['Parking', 'Bride Room', 'Generator', 'Kitchen', 'Catering', 'Sound System', 'Security'];
 
   const [toast, setToast] = useState(null);
   const [imageFile, setImageFile] = useState(null);
@@ -82,6 +88,18 @@ export default function ListBusiness() {
         [name]: type === 'checkbox' ? checked : value
       }));
     }
+  };
+
+  const handleAmenityToggle = (amenity) => {
+    setFormData(prev => {
+      const isSelected = prev.amenities.includes(amenity);
+      return {
+        ...prev,
+        amenities: isSelected 
+          ? prev.amenities.filter(a => a !== amenity)
+          : [...prev.amenities, amenity]
+      };
+    });
   };
 
   const handleImageChange = (e) => {
@@ -157,7 +175,14 @@ export default function ListBusiness() {
            active: formData.liveStatus.active,
            locationName: formData.liveStatus.locationName,
            expiresAt: expirationTimestamp
-        }
+        },
+        // Wedding Venues Specific Schema
+        ...(formData.category === 'Wedding Venues' && {
+           capacity: parseInt(formData.capacity) || 0,
+           setting: formData.setting,
+           amenities: formData.amenities,
+           pricingModel: formData.pricingModel
+        })
       };
 
       // Push to live Firestore database
@@ -375,6 +400,65 @@ export default function ListBusiness() {
             />
           </div>
         </div>
+
+        {/* Wedding Venue Extended Info */}
+        {formData.category === 'Wedding Venues' && (
+          <div className="bg-white/50 dark:bg-[#4a0d13] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60 space-y-6">
+            <h2 className="text-xl font-black tracking-tight mb-2 dark:text-white border-b border-gray-100 dark:border-gray-800/50 pb-4">Venue Logistics</h2>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Capacity (Pax)</label>
+                <input 
+                  type="number" required placeholder="e.g. 500" name="capacity" value={formData.capacity} onChange={handleChange}
+                  className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors font-medium text-center"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Setting</label>
+                <select 
+                  name="setting" value={formData.setting} onChange={handleChange}
+                  className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-2 px-3 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium text-center h-[42px]"
+                >
+                  <option>Indoor</option>
+                  <option>Outdoor</option>
+                  <option>Both</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Pricing Model</label>
+              <select 
+                name="pricingModel" value={formData.pricingModel} onChange={handleChange}
+                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium"
+              >
+                <option>Venue Rental Fee</option>
+                <option>Per Plate / Package</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Amenities Included</label>
+              <div className="flex flex-wrap gap-2">
+                {availableAmenities.map(amenity => (
+                  <button
+                    type="button"
+                    key={amenity}
+                    onClick={() => handleAmenityToggle(amenity)}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition ${
+                      formData.amenities.includes(amenity) 
+                        ? 'bg-[#CD1C18] text-white shadow-md' 
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {amenity}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Media & Links */}
         <div className="bg-white/50 dark:bg-[#4a0d13] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60 space-y-6">

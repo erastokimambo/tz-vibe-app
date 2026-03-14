@@ -1,4 +1,4 @@
-import { MapPin, Phone, Coffee, Star, BadgeCheck, CalendarDays, ExternalLink, Calendar, MessageCircle } from 'lucide-react';
+import { MapPin, Phone, Coffee, Star, BadgeCheck, CalendarDays, ExternalLink, Calendar, MessageCircle, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -165,7 +165,12 @@ export default function BusinessCard({ business, onClick }) {
           <span className="bg-black/50 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/20 uppercase tracking-wide w-fit">
             {category}
           </span>
-          {business.liveStatus?.active && (!business.liveStatus.expiresAt || new Date() < new Date(business.liveStatus.expiresAt)) && (
+          {category === 'Wedding Venues' && business.capacity ? (
+            <span className="flex w-fit items-center gap-1 bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/30 backdrop-blur-md shadow-lg shadow-black/20">
+              <Users size={14} />
+              {business.capacity}+ Pax
+            </span>
+          ) : business.liveStatus?.active && (!business.liveStatus.expiresAt || new Date() < new Date(business.liveStatus.expiresAt)) && (
             <span className="flex w-fit items-center gap-1 bg-[#CD1C18] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-[#CD1C18]/50 animate-pulse">
               Live Tonight
             </span>
