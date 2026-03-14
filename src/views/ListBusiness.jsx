@@ -3,8 +3,35 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, Trash2, GlassWater, Music, CalendarHeart, Utensils } from 'lucide-react';
 import { db } from '../firebase/config';
 import { collection, addDoc } from 'firebase/firestore';
+import { useAuth } from '../contexts/AuthContext';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+function LocationMarker({ position, setPosition }) {
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+    },
+  });
+  return position === null ? null : <Marker position={position}></Marker>;
+}
+
+const tanzaniaRegions = [
+  'Arusha', 'Dar es Salaam', 'Dodoma', 'Geita', 'Iringa', 'Kagera', 'Katavi', 'Kigoma', 'Kilimanjaro', 'Lindi', 'Manyara', 'Mara', 'Mbeya', 'Morogoro', 'Mtwara', 'Mwanza', 'Njombe', 'Pemba North', 'Pemba South', 'Pwani', 'Rukwa', 'Ruvuma', 'Shinyanga', 'Simiyu', 'Singida', 'Songwe', 'Tabora', 'Tanga', 'Zanzibar Central/South', 'Zanzibar North', 'Zanzibar Urban/West'
+];
 
 export default function ListBusiness() {
+  const { userProfile } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -16,6 +43,8 @@ export default function ListBusiness() {
     instagram: '',
     image: '',
     menuUrl: '',
+    googleMapsUrl: '',
+    mapCoordinates: null,
     priceRange: '$$',
     rating: 5.0,
     trendingScore: 50,
@@ -68,6 +97,7 @@ export default function ListBusiness() {
       // Create new object
       const newBusiness = {
         ...formData,
+        ownerId: userProfile?.uid || 'anonymous',
         rating: parseFloat(formData.rating) || 5.0,
         trendingScore: parseInt(formData.trendingScore) || 50,
         createdAt: new Date().toISOString()
@@ -201,14 +231,56 @@ export default function ListBusiness() {
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Location / City</label>
-            <input 
-              required type="text" name="location" value={formData.location} onChange={handleChange}
-              placeholder="e.g. Masaki, Dar es Salaam"
-              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium"
-            />
-          </div>
+          {formData.category === 'DJs' ? (
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Region (Tanzania)</label>
+              <select 
+                required name="location" value={formData.location} onChange={handleChange}
+                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium"
+              >
+                <option value="" disabled>Select Region</option>
+                {tanzaniaRegions.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+          ) : (
+            <div className="space-y-6 pt-4 border-t border-gray-100 dark:border-gray-800/50">
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">Location Details</h3>
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Location Name / Address</label>
+                <input 
+                  required type="text" name="location" value={formData.location} onChange={handleChange}
+                  placeholder="e.g. Masaki, Dar es Salaam"
+                  className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Google Maps Link (Optional)</label>
+                <input 
+                  type="url" name="googleMapsUrl" value={formData.googleMapsUrl} onChange={handleChange}
+                  placeholder="https://maps.app.goo.gl/..."
+                  className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pin on Radar Map</label>
+                  {formData.mapCoordinates && <span className="text-xs text-green-500 font-bold">✓ Pinned</span>}
+                </div>
+                <div className="h-64 rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-sm relative z-0">
+                  <MapContainer center={[-6.7924, 39.2083]} zoom={12} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+                    <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+                    <LocationMarker 
+                      position={formData.mapCoordinates} 
+                      setPosition={(latlng) => setFormData(p => ({...p, mapCoordinates: latlng}))} 
+                    />
+                  </MapContainer>
+                </div>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 italic">Tap the map to set the exact coordinates for the live Explore radar.</p>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Description</label>
