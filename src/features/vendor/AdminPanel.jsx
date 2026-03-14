@@ -45,13 +45,16 @@ export default function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#38000A]">
-      <div className="sticky top-0 z-40 bg-white/90 dark:bg-[#38000A]/90 backdrop-blur-lg px-4 pt-12 pb-4 border-b dark:border-gray-800 flex items-center gap-3">
-        <Link to="/menu" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
-          <ArrowLeft size={24} className="text-gray-900 dark:text-white" />
-        </Link>
-        <h1 className="text-xl font-bold text-purple-600 dark:text-purple-400 flex items-center gap-2">
-          Admin Panel <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full uppercase tracking-widest font-bold">Root</span>
-        </h1>
+      <div className="sticky top-0 z-40 bg-white/90 dark:bg-[#38000A]/90 backdrop-blur-lg px-4 pt-12 pb-4 border-b dark:border-gray-800 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link to="/menu" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+            <ArrowLeft size={24} className="text-gray-900 dark:text-white" />
+          </Link>
+          <h1 className="text-xl font-bold text-purple-600 dark:text-purple-400">
+            Admin Panel
+          </h1>
+        </div>
+        <span className="text-[10px] bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-2.5 py-1 rounded-full uppercase tracking-widest font-black flex-none">Root Access</span>
       </div>
 
       <div className="p-4 flex flex-col gap-4 pb-20">
