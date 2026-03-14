@@ -90,17 +90,17 @@ export default function UserMenu() {
     <div className="min-h-screen bg-gray-50 dark:bg-[#38000A] p-4 pt-12 pb-24">
       <h1 className="text-3xl font-bold mb-6 text-[#CD1C18] dark:text-[#FFA896]">Menu</h1>
 
-      {/* Profile Card */}
-      <div className="bg-white dark:bg-[#4a0d13] rounded-2xl p-4 shadow-sm mb-6 flex items-center justify-between border dark:border-gray-800">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gray-200 dark:bg-[#38000A] rounded-full flex flex-shrink-0 items-center justify-center border-2 border-[transparent]">
-            <User size={32} className="text-gray-400 dark:text-gray-600" />
-          </div>
-          <div className="overflow-hidden">
-            <h2 className="text-xl font-bold truncate dark:text-white">
-              {isGuest ? 'Anonymous Guest' : (userProfile?.displayName || 'User')}
-            </h2>
-            {!isGuest && (
+      {/* Profile Card or Guest Banner */}
+      {!isGuest ? (
+        <div className="bg-white dark:bg-[#4a0d13] rounded-2xl p-4 shadow-sm mb-6 flex items-center justify-between border dark:border-gray-800">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-gray-200 dark:bg-[#38000A] rounded-full flex flex-shrink-0 items-center justify-center border-2 border-[transparent]">
+              <User size={32} className="text-gray-400 dark:text-gray-600" />
+            </div>
+            <div className="overflow-hidden">
+              <h2 className="text-xl font-bold truncate dark:text-white">
+                {userProfile?.displayName || 'User'}
+              </h2>
               <p 
                 onClick={() => {
                   setNewName(userProfile?.displayName || '');
@@ -110,12 +110,29 @@ export default function UserMenu() {
               >
                 Edit Profile
               </p>
-            )}
+            </div>
           </div>
         </div>
-      </div>
-
-
+      ) : (
+        <div className="mb-8 flex justify-center">
+          <button 
+            onClick={() => navigate('/')} 
+            className="flex items-center gap-3 bg-white/5 border border-white/10 p-4 rounded-3xl shadow-lg backdrop-blur-md hover:bg-white/10 transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#CD1C18] to-[#9B1313] flex items-center justify-center text-white font-black text-xl shadow-[0_0_15px_rgba(205,28,24,0.3)] group-hover:scale-105 transition-transform">
+              Tv
+            </div>
+            <div className="text-left">
+              <span className="block text-2xl font-black tracking-tight text-white leading-none">
+                TzVibe.
+              </span>
+              <span className="block text-xs font-bold text-[#FFA896] uppercase tracking-widest mt-1">
+                Back to Home
+              </span>
+            </div>
+          </button>
+        </div>
+      )}
 
       {/* Menu Content or Guest Splash */}
       {!isGuest ? (
