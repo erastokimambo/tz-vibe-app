@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
 import { doc, setDoc } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
+import { signOut, updateProfile } from 'firebase/auth';
 import { db, auth } from '../firebase/config';
 
 export default function UserMenu() {
@@ -38,17 +38,33 @@ export default function UserMenu() {
     }] : [])
   ];
 
-  const handleSaveProfile = async () => {
+  const handleSaveProfile = () => {
     if (!newName.trim() || !userProfile?.uid) return;
     setIsSaving(true);
+    
     try {
-      await setDoc(doc(db, 'users', userProfile.uid), {
+      // Execute Firestore update in the background (no await) to prevent hanging UI 
+      // when network connections are spotty or WebSockets drop.
+      setDoc(doc(db, 'users', userProfile.uid), {
         displayName: newName.trim()
-      }, { merge: true });
-      setIsEditing(false);
+      }, { merge: true }).catch(err => {
+        console.error("Error updating profile in db:", err);
+      });
+
+      // Synchronize changes to Firebase Auth native profile
+      if (auth.currentUser) {
+        updateProfile(auth.currentUser, { displayName: newName.trim() }).catch(e => console.error(e));
+      }
+      
+      // Close modal and force a refresh to pull the updated username state globally
+      setTimeout(() => {
+        setIsSaving(false);
+        setIsEditing(false);
+        window.location.reload();
+      }, 500);
+
     } catch (error) {
-      console.error("Error updating profile:", error);
-    } finally {
+      console.error("Error initiating profile save:", error);
       setIsSaving(false);
     }
   };
