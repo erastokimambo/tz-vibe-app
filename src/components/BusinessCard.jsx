@@ -31,24 +31,42 @@ export default function BusinessCard({ business, onClick }) {
   
   const openRide = () => {
     const region = location?.toLowerCase() || '';
-    let url = '';
+    let appUrl = '';
+    let webFallback = '';
     
     if (region.includes('arusha')) {
-       url = `indrive://search?addr=${encodeURIComponent(business.logistics?.addressString || location || name)}`;
+       const addr = encodeURIComponent(business.logistics?.addressString || location || name);
+       appUrl = `indrive://search?addr=${addr}`;
+       webFallback = 'https://indrive.com';
     } else if (region.includes('dar es salaam') || region.includes('dar')) {
        if (business.logistics?.coordinates) {
-         url = `bolt://request?dest_lat=${business.logistics.coordinates.lat}&dest_lng=${business.logistics.coordinates.lng}`;
+         appUrl = `bolt://request?dest_lat=${business.logistics.coordinates.lat}&dest_lng=${business.logistics.coordinates.lng}`;
        } else {
-         url = `bolt://request?dest_lat=&dest_lng=&destination_name=${encodeURIComponent(business.logistics?.addressString || location || name)}`;
+         appUrl = `bolt://request?dest_lat=&dest_lng=&destination_name=${encodeURIComponent(business.logistics?.addressString || location || name)}`;
        }
+       webFallback = 'https://bolt.eu/'; 
     } else {
-      if (business.logistics?.coordinates) {
-        url = `https://maps.google.com/?q=${business.logistics.coordinates.lat},${business.logistics.coordinates.lng}`;
-      } else {
-        url = `https://maps.google.com/?q=${encodeURIComponent(business.logistics?.addressString || location || name)}`;
-      }
+       // Generic Google Maps fallback
+       if (business.logistics?.coordinates) {
+         webFallback = `https://maps.google.com/?q=${business.logistics.coordinates.lat},${business.logistics.coordinates.lng}`;
+       } else {
+         webFallback = `https://maps.google.com/?q=${encodeURIComponent(business.logistics?.addressString || location || name)}`;
+       }
     }
-    window.open(url, '_blank');
+
+    if (appUrl) {
+      const start = Date.now();
+      window.location.assign(appUrl);
+      
+      // Fallback if app doesn't open (meaning we didn't background the browser)
+      setTimeout(() => {
+        if (Date.now() - start < 1500) {
+          window.open(webFallback, '_blank');
+        }
+      }, 1000);
+    } else {
+      window.open(webFallback, '_blank');
+    }
   };
   
   const openMenu = () => window.open(menuUrl, '_blank');
