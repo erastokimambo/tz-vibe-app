@@ -28,13 +28,13 @@ export default function BusinessCard({ business, onClick }) {
   return (
     <div 
       onClick={onClick}
-      className="relative w-full h-[400px] mb-6 rounded-3xl overflow-hidden shadow-lg cursor-pointer bg-gray-100 dark:bg-gray-800 transition-transform active:scale-[0.98]"
+      className="group relative w-full h-[400px] mb-6 rounded-3xl overflow-hidden shadow-2xl cursor-pointer bg-white/5 border border-white/10 backdrop-blur-md hover:border-[#CD1C18]/50 transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
     >
       {/* Background Image */}
-      <img src={image} alt={name} className="absolute inset-0 w-full h-full object-cover" />
+      <img src={image} alt={name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
       
       {/* Gradient Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#38000A] via-[#38000A]/40 to-black/30" />
 
       {/* Top Badges */}
       <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
@@ -73,25 +73,25 @@ export default function BusinessCard({ business, onClick }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-4">
           {phone && (
             <button 
               onClick={(e) => handleAction(e, callBusiness)}
-              className="flex-1 flex items-center justify-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 py-2.5 rounded-xl font-semibold transition"
+              className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 min-h-[44px] rounded-xl font-semibold transition"
             >
               <Phone size={18} /> Call
             </button>
           )}
           <button 
             onClick={(e) => handleAction(e, openRide)}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#CD1C18] hover:bg-[#9B1313] py-2.5 rounded-xl font-semibold transition"
+            className="flex-1 flex items-center justify-center gap-2 bg-[#CD1C18] hover:bg-[#9B1313] min-h-[44px] rounded-xl font-bold transition shadow-lg shadow-[#CD1C18]/30"
           >
             <MapPin size={18} /> Ride
           </button>
           {menuUrl && (
             <button 
               onClick={(e) => handleAction(e, openMenu)}
-              className="flex-none flex items-center justify-center bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 w-11 h-11 rounded-xl transition"
+              className="flex-none flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 min-h-[44px] min-w-[44px] rounded-xl transition"
             >
               <Coffee size={18} />
             </button>
