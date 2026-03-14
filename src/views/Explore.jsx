@@ -76,10 +76,10 @@ export default function Explore() {
     <div className="min-h-screen bg-gray-50 dark:bg-[#38000A]">
       {/* Sticky Header */}
       <div className="sticky top-0 z-40 bg-white/90 dark:bg-[#38000A]/90 backdrop-blur-lg px-4 pt-12 pb-2 border-b dark:border-gray-800">
-        
-        {/* Search Bar */}
-        <div className="flex items-center gap-2 mb-4 relative z-50">
-          <div className="relative flex-1">
+        <div className="max-w-4xl mx-auto w-full">
+          {/* Search Bar */}
+          <div className="flex items-center gap-2 mb-4 relative z-50">
+            <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <form onSubmit={(e) => { e.preventDefault(); handleSearchSubmit(); }}>
               <input 
@@ -160,21 +160,22 @@ export default function Explore() {
           </button>
         </div>
 
-        {/* Categories */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`flex-none px-5 py-2 rounded-full font-semibold transition-colors ${
-                selectedCategory === cat 
-                  ? 'bg-black dark:bg-white text-white dark:text-black' 
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          {/* Categories */}
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 justify-center">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`flex-none px-6 py-2.5 rounded-full font-bold transition-all shadow-sm ${
+                  selectedCategory === cat 
+                    ? 'bg-[#CD1C18] text-white scale-105' 
+                    : 'bg-white dark:bg-[#4a0d13] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

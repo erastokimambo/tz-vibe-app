@@ -33,15 +33,15 @@ export default function TopNav() {
             to={item.path}
             end={item.end}
             className={({ isActive }) =>
-              `flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all duration-300 ${
+              `flex items-center justify-center p-3 rounded-2xl transition-all duration-300 ${
                 isActive
-                  ? 'bg-[#CD1C18]/10 dark:bg-[#FFA896]/10 text-[#CD1C18] dark:text-[#FFA896] font-bold'
-                  : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium'
+                  ? 'bg-[#CD1C18]/10 dark:bg-[#FFA896]/10 text-[#CD1C18] dark:text-[#FFA896]'
+                  : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`
             }
+            title={item.label}
           >
-            <item.icon size={20} className="shrink-0" />
-            <span className="text-[14px]">{item.label}</span>
+            <item.icon size={22} className="shrink-0" />
           </NavLink>
         ))}
       </nav>
