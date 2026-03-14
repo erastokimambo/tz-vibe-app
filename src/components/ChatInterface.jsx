@@ -1,7 +1,7 @@
 import { ArrowLeft, Phone, Video, MoreVertical, Send, Smile, Paperclip } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase/config';
+import { useAuth } from "../context/AuthContext";
+import { db } from "../services/config";
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
 
 export default function ChatInterface({ chat, onClose }) {

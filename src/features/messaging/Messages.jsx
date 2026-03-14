@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import ChatInterface from '../components/ChatInterface';
-import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase/config';
+import ChatInterface from "../../components/ChatInterface";
+import { useAuth } from "../../context/AuthContext";
+import { db } from "../../services/config";
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 
 export default function Messages() {

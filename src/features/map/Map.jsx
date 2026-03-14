@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import BusinessDetailModal from '../components/BusinessDetailModal';
-import { db } from '../firebase/config';
+import BusinessDetailModal from "../../components/BusinessDetailModal";
+import { db } from "../../services/config";
 import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function MapView() {

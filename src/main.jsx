@@ -1,20 +1,20 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import './index.css';
+import './styles/index.css';
 import App from './App.jsx';
-import Explore from './views/Explore.jsx';
-import MapView from './views/Map.jsx';
-import Trending from './views/Trending.jsx';
-import Messages from './views/Messages.jsx';
-import UserMenu from './views/UserMenu.jsx';
-import ListBusiness from './views/ListBusiness.jsx';
-import Landing from './views/Landing.jsx';
-import Login from './views/Login.jsx';
-import SavedListings from './views/SavedListings.jsx';
-import MyPlans from './views/MyPlans.jsx';
-import ManageListings from './views/ManageListings.jsx';
-import AdminPanel from './views/AdminPanel.jsx';
+import Explore from './features/explore/Explore.jsx';
+import MapView from './features/map/Map.jsx';
+import Trending from './features/explore/Trending.jsx';
+import Messages from './features/messaging/Messages.jsx';
+import UserMenu from './components/UserMenu.jsx';
+import ListBusiness from './features/vendor/ListBusiness.jsx';
+import Landing from './features/explore/Landing.jsx';
+import Login from './features/explore/Login.jsx';
+import SavedListings from './features/explore/SavedListings.jsx';
+import MyPlans from './features/explore/MyPlans.jsx';
+import ManageListings from './features/vendor/ManageListings.jsx';
+import AdminPanel from './features/vendor/AdminPanel.jsx';
 
 const router = createBrowserRouter([
   {
@@ -73,7 +73,7 @@ const router = createBrowserRouter([
   }
 ]);
 
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

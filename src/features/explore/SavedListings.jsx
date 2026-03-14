@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, MapPin, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase/config';
+import { useAuth } from "../../context/AuthContext";
+import { db } from "../../services/config";
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function SavedListings() {

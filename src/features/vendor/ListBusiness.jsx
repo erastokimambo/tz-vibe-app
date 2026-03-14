@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, Trash2, GlassWater, Music, CalendarHeart, Utensils } from 'lucide-react';
-import { db, storage } from '../firebase/config';
+import { db, storage } from "../../services/config";
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from "../../context/AuthContext";
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';

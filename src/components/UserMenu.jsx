@@ -1,10 +1,10 @@
 import { User, Heart, Calendar, PlusSquare, Settings, LogOut, LogIn, ShieldCheck, X, Check } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from "../context/AuthContext";
 import { useState } from 'react';
 import { doc, setDoc } from 'firebase/firestore';
 import { signOut, updateProfile } from 'firebase/auth';
-import { db, auth } from '../firebase/config';
+import { db, auth } from "../services/config";
 
 export default function UserMenu() {
   const { userProfile, loading, isGuest } = useAuth();

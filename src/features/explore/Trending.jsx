@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Flame } from 'lucide-react';
-import BusinessDetailModal from '../components/BusinessDetailModal';
-import { db } from '../firebase/config';
+import BusinessDetailModal from "../../components/BusinessDetailModal";
+import { db } from "../../services/config";
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useEffect } from 'react';
 

@@ -1,7 +1,7 @@
 import { Search, MapPin, Flame, MessageCircle, Menu, LogIn } from 'lucide-react';
 import clsx from 'clsx';
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from "../context/AuthContext";
 
 export default function BottomNav() {
   const { isGuest } = useAuth();

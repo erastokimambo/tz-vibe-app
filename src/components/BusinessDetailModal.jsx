@@ -1,8 +1,8 @@
 import { X, MapPin, MessageCircle, Navigation, Heart, Share2, Star, Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from "../context/AuthContext";
 import { doc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db } from "../services/config";
 
 export default function BusinessDetailModal({ business, onClose }) {
   const { userProfile } = useAuth();

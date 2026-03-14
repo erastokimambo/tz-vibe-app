@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase/config';
+import { useAuth } from "../../context/AuthContext";
+import { db } from "../../services/config";
 import { collection, onSnapshot, deleteDoc, updateDoc, doc } from 'firebase/firestore';
 
 export default function AdminPanel() {

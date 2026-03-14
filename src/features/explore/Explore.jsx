@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import BusinessCard from '../components/BusinessCard';
-import BusinessDetailModal from '../components/BusinessDetailModal';
-import { db } from '../firebase/config';
+import BusinessCard from "../../components/BusinessCard";
+import BusinessDetailModal from "../../components/BusinessDetailModal";
+import { db } from "../../services/config";
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useEffect } from 'react';
 

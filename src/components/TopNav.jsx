@@ -1,6 +1,6 @@
 import { Search, MapPin, MessageCircle, Menu, Flame, LogIn } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from "../context/AuthContext";
 
 export default function TopNav() {
   const { isGuest } = useAuth();
