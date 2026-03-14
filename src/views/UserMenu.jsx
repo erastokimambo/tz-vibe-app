@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { signOut } from 'firebase/auth';
+import { db, auth } from '../firebase/config';
 
 export default function UserMenu() {
   const { user, userProfile, loading } = useAuth();
@@ -57,8 +58,7 @@ export default function UserMenu() {
 
   const handleSignOut = async () => {
     try {
-      // Import signOut if it's missing at the top or use auth.signOut() directly
-      await import('firebase/auth').then(({ signOut }) => signOut(db.app.auth()));
+      await signOut(auth);
       navigate('/login');
     } catch (error) {
        console.error("Failed to sign out:", error);
