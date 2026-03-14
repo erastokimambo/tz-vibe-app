@@ -79,7 +79,7 @@ export default function ListBusiness() {
       setToast('✅ Business saved successfully!');
       setTimeout(() => {
         setToast(null);
-        navigate('/app'); // Go back home to see it in Explore tab
+        navigate('/'); // Go back home to see it in Explore tab
       }, 2000);
     } catch (err) {
       console.error("Error adding document: ", err);
