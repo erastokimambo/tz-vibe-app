@@ -161,20 +161,22 @@ export default function Explore() {
         </div>
 
           {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 justify-center">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`flex-none px-6 py-2.5 rounded-full font-bold transition-all shadow-sm ${
-                  selectedCategory === cat 
-                    ? 'bg-[#CD1C18] text-white scale-105' 
-                    : 'bg-white dark:bg-[#4a0d13] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          <div className="flex justify-center w-full">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 px-1 max-w-full">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`flex-none px-6 py-2.5 rounded-full font-bold transition-all shadow-sm ${
+                    selectedCategory === cat 
+                      ? 'bg-[#CD1C18] text-white scale-105' 
+                      : 'bg-white dark:bg-[#4a0d13] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
