@@ -13,7 +13,7 @@ export default function UserMenu() {
   const navigate = useNavigate();
 
   // Check if the current user is a guest (anonymous)
-  const isGuest = userProfile?.displayName === 'Anonymous Guest';
+  const isGuest = userProfile?.displayName === 'Anonymous Guest' || user?.isAnonymous;
 
 
 
@@ -85,7 +85,7 @@ export default function UserMenu() {
           </div>
           <div className="overflow-hidden">
             <h2 className="text-xl font-bold truncate dark:text-white">
-              {userProfile?.displayName || 'Anonymous Guest'}
+              {isGuest ? 'Anonymous Guest' : userProfile?.displayName || 'User'}
             </h2>
             {!isGuest && (
               <p 
