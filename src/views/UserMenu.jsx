@@ -6,14 +6,14 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 export default function UserMenu() {
-  const { userProfile, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
 
-  // Check if the current user is a guest (anonymous)
-  const isGuest = userProfile?.displayName === 'Anonymous Guest' || user?.isAnonymous;
+  // If the user hasn't explicitly renamed themself and is an anonymous Firebase Auth session
+  const isGuest = userProfile?.displayName === 'Anonymous Guest' || user?.isAnonymous === true;
 
 
 
@@ -85,7 +85,7 @@ export default function UserMenu() {
           </div>
           <div className="overflow-hidden">
             <h2 className="text-xl font-bold truncate dark:text-white">
-              {isGuest ? 'Anonymous Guest' : userProfile?.displayName || 'User'}
+              {isGuest ? 'Anonymous Guest' : (userProfile?.displayName || 'User')}
             </h2>
             {!isGuest && (
               <p 
