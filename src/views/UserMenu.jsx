@@ -1,5 +1,5 @@
-import { User, Heart, Calendar, PlusSquare, Settings, LogOut, ShieldCheck, Moon, Sun, X, Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { User, Heart, Calendar, PlusSquare, Settings, LogOut, LogIn, ShieldCheck, X, Check } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -10,6 +10,10 @@ export default function UserMenu() {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const navigate = useNavigate();
+
+  // Check if the current user is a guest (anonymous)
+  const isGuest = userProfile?.displayName === 'Anonymous Guest';
 
 
 
@@ -51,6 +55,16 @@ export default function UserMenu() {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      // Import signOut if it's missing at the top or use auth.signOut() directly
+      await import('firebase/auth').then(({ signOut }) => signOut(db.app.auth()));
+      navigate('/login');
+    } catch (error) {
+       console.error("Failed to sign out:", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-[#38000A] p-4 pt-12 pb-24 flex items-center justify-center">
@@ -66,22 +80,24 @@ export default function UserMenu() {
       {/* Profile Card */}
       <div className="bg-white dark:bg-[#4a0d13] rounded-2xl p-4 shadow-sm mb-6 flex items-center justify-between border dark:border-gray-800">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gray-200 dark:bg-[#38000A] rounded-full flex flex-shrink-0 items-center justify-center border-2 border-[#CD1C18]">
-            <User size={32} className="text-[#CD1C18] dark:text-[#FFA896]" />
+          <div className="w-16 h-16 bg-gray-200 dark:bg-[#38000A] rounded-full flex flex-shrink-0 items-center justify-center border-2 border-[transparent]">
+            <User size={32} className="text-gray-400 dark:text-gray-600" />
           </div>
           <div className="overflow-hidden">
             <h2 className="text-xl font-bold truncate dark:text-white">
               {userProfile?.displayName || 'Anonymous Guest'}
             </h2>
-            <p 
-              onClick={() => {
-                setNewName(userProfile?.displayName || '');
-                setIsEditing(true);
-              }}
-              className="text-sm text-[#CD1C18] dark:text-[#FFA896] font-medium cursor-pointer hover:underline"
-            >
-              Edit Profile
-            </p>
+            {!isGuest && (
+              <p 
+                onClick={() => {
+                  setNewName(userProfile?.displayName || '');
+                  setIsEditing(true);
+                }}
+                className="text-sm text-[#CD1C18] dark:text-[#FFA896] font-medium cursor-pointer hover:underline"
+              >
+                Edit Profile
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -117,12 +133,22 @@ export default function UserMenu() {
         </div>
       ))}
 
-      {/* Log out */}
+      {/* Authentication Action */}
       <div className="mt-8 px-2">
-        <button className="flex items-center justify-center gap-2 w-full py-4 text-[#CD1C18] font-bold bg-[#CD1C18]/10 rounded-2xl hover:bg-[#CD1C18]/20 transition-colors">
-          <LogOut size={20} />
-          Sign Out
-        </button>
+        {isGuest ? (
+          <Link to="/login" className="flex items-center justify-center gap-2 w-full py-4 text-white font-bold bg-[#CD1C18] rounded-2xl hover:bg-[#9B1313] shadow-lg shadow-[#CD1C18]/30 transition-all hover:scale-[1.02]">
+            <LogIn size={20} />
+            Sign In / Create Account
+          </Link>
+        ) : (
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center justify-center gap-2 w-full py-4 text-[#CD1C18] font-bold bg-[#CD1C18]/10 rounded-2xl hover:bg-[#CD1C18]/20 transition-colors"
+          >
+            <LogOut size={20} />
+            Sign Out
+          </button>
+        )}
       </div>
 
       {/* Edit Profile Modal */}
