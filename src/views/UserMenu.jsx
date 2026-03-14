@@ -19,21 +19,21 @@ export default function UserMenu() {
     {
       title: "My Activity",
       items: [
-        { icon: Calendar, label: "My Plans", bg: "bg-blue-500", link: "/app/dashboard/plans" },
-        { icon: Heart, label: "Saved Listings", bg: "bg-pink-500", link: "/app/dashboard/saved" },
+        { icon: Calendar, label: "My Plans", bg: "bg-blue-500", link: "/dashboard/plans" },
+        { icon: Heart, label: "Saved Listings", bg: "bg-pink-500", link: "/dashboard/saved" },
       ]
     },
     {
       title: "Business",
       items: [
-        { icon: PlusSquare, label: "Record Data / List Business", bg: "bg-green-500", link: "/app/list-business" },
-        { icon: Settings, label: "Manage Listings", bg: "bg-gray-600", link: "/app/dashboard/manage" },
+        { icon: PlusSquare, label: "Record Data / List Business", bg: "bg-green-500", link: "/list-business" },
+        { icon: Settings, label: "Manage Listings", bg: "bg-gray-600", link: "/dashboard/manage" },
       ]
     },
     ...(userProfile?.isAdmin ? [{
       title: "Settings & Admin",
       items: [
-        { icon: ShieldCheck, label: "Admin Panel", bg: "bg-purple-600", link: "/app/admin" },
+        { icon: ShieldCheck, label: "Admin Panel", bg: "bg-purple-600", link: "/admin" },
       ]
     }] : [])
   ];

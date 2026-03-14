@@ -49,7 +49,7 @@ export default function Navbar() {
             <a href="#how-it-works" className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">How it Works</a>
             <a href="#business" className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">For Business</a>
             <div className="pt-4">
-              <a href="/app/" className="block text-center w-full bg-[#CD1C18] text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg">
+              <a href="/" className="block text-center w-full bg-[#CD1C18] text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg">
                 Launch App
               </a>
             </div>

@@ -53,7 +53,7 @@ export default function BusinessDetailModal({ business, onClose }) {
         await navigator.share({
           title: `Check out ${name} on TzVibe!`,
           text: description,
-          url: `${window.location.origin}/app?business=${id}`,
+          url: `${window.location.origin}/?business=${id}`,
         });
       }
     } catch (error) {

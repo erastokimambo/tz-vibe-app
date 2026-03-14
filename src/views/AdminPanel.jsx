@@ -23,7 +23,7 @@ export default function AdminPanel() {
   }, [userProfile]);
 
   if (authLoading) return <div className="p-8 text-center text-gray-500">Loading auth...</div>;
-  if (!userProfile?.isAdmin) return <Navigate to="/app/menu" />;
+  if (!userProfile?.isAdmin) return <Navigate to="/menu" />;
 
   const toggleVerify = async (id, currentStatus) => {
     try {
@@ -46,7 +46,7 @@ export default function AdminPanel() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#38000A]">
       <div className="sticky top-0 z-40 bg-white/90 dark:bg-[#38000A]/90 backdrop-blur-lg px-4 pt-12 pb-4 border-b dark:border-gray-800 flex items-center gap-3">
-        <Link to="/app/menu" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+        <Link to="/menu" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
           <ArrowLeft size={24} className="text-gray-900 dark:text-white" />
         </Link>
         <h1 className="text-xl font-bold text-purple-600 dark:text-purple-400 flex items-center gap-2">
