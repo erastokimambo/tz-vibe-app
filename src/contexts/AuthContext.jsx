@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
 
   // Expose an immediate, definitive boolean for Guest status
   // This prevents UI flicker while waiting for the Firestore userProfile to sync
-  const isGuest = user?.isAnonymous === true;
+  const isGuest = !user || user.isAnonymous === true;
 
   return (
     <AuthContext.Provider value={{ user, userProfile, loading, isGuest }}>
