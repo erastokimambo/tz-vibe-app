@@ -6,13 +6,14 @@ import { doc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, onSnapshot
 import { db } from "../services/config";
 
 export default function BusinessDetailModal({ business, onClose }) {
-  const { userProfile } = useAuth();
+  const { userProfile, isGuest } = useAuth();
   const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [newReviewText, setNewReviewText] = useState('');
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   // Booking State
   const [isBookingOpen, setIsBookingOpen] = useState(false);
@@ -133,8 +134,8 @@ export default function BusinessDetailModal({ business, onClose }) {
   };
 
   const handleBooking = async () => {
-    if (!userProfile) {
-      alert("Please log in to book a table.");
+    if (isGuest || !userProfile) {
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -162,8 +163,8 @@ export default function BusinessDetailModal({ business, onClose }) {
   };
 
   const handleMessage = async () => {
-    if (!userProfile) {
-      alert("Please log in to send a message.");
+    if (isGuest) {
+      setIsAuthModalOpen(true);
       return;
     }
     
@@ -405,6 +406,38 @@ export default function BusinessDetailModal({ business, onClose }) {
                 'Request VIP Table'
               )}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Auth Modal Overlay for Messaging/Bookings */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="bg-[#38000A] w-full sm:max-w-md rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-300 border border-[#CD1C18]/30 flex flex-col items-center text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-[#CD1C18] to-[#9B1313] rounded-3xl flex items-center justify-center text-white mb-6 shadow-xl shadow-[#CD1C18]/20 rotate-3">
+              <MessageCircle size={40} />
+            </div>
+            <h3 className="text-2xl font-black text-white mb-3">Join the Vibe</h3>
+            <p className="text-gray-300 mb-8 font-medium leading-relaxed">
+              Log in to start a vibe. Keep your chats and bookings synced across all devices.
+            </p>
+            <div className="flex flex-col gap-3 w-full">
+              <button 
+                onClick={() => {
+                  onClose();
+                  navigate('/login');
+                }}
+                className="w-full py-4 bg-[#CD1C18] hover:bg-[#9B1313] text-white rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition"
+              >
+                Sign In / Create Account
+              </button>
+              <button 
+                onClick={() => setIsAuthModalOpen(false)}
+                className="w-full py-4 bg-transparent text-gray-400 hover:text-white rounded-2xl font-bold transition"
+              >
+                Maybe Later
+              </button>
+            </div>
           </div>
         </div>
       )}
