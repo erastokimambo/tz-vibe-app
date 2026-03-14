@@ -1,16 +1,21 @@
-import { Search, MapPin, Flame, MessageCircle, Menu } from 'lucide-react';
+import { Search, MapPin, Flame, MessageCircle, Menu, LogIn } from 'lucide-react';
 import clsx from 'clsx';
 import { NavLink } from 'react-router-dom';
-
-const navItems = [
-  { path: '/', label: 'Explore', icon: Search },
-  { path: '/map', label: 'Map', icon: MapPin },
-  { path: '/trending', label: 'Trending', icon: Flame },
-  { path: '/messages', label: 'Messages', icon: MessageCircle },
-  { path: '/menu', label: 'Menu', icon: Menu },
-];
+import { useAuth } from '../contexts/AuthContext';
 
 export default function BottomNav() {
+  const { user, userProfile } = useAuth();
+  const isGuest = userProfile?.displayName === 'Anonymous Guest' || user?.isAnonymous === true;
+
+  const navItems = [
+    { path: '/', label: 'Explore', icon: Search },
+    { path: '/map', label: 'Map', icon: MapPin },
+    { path: '/trending', label: 'Trending', icon: Flame },
+    { path: '/messages', label: 'Messages', icon: MessageCircle },
+    ...(isGuest ? [{ path: '/login', label: 'Log In', icon: LogIn }] : []),
+    { path: '/menu', label: 'Menu', icon: Menu },
+  ];
+
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#4a0d13] border-t dark:border-gray-800 pb-safe">
       <nav className="flex justify-around items-center h-16 max-w-md mx-auto px-2">

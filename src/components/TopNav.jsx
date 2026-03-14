@@ -1,12 +1,17 @@
-import { Search, MapPin, MessageCircle, Menu, Flame } from 'lucide-react';
+import { Search, MapPin, MessageCircle, Menu, Flame, LogIn } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function TopNav() {
+  const { user, userProfile } = useAuth();
+  const isGuest = userProfile?.displayName === 'Anonymous Guest' || user?.isAnonymous === true;
+
   const navItems = [
     { icon: Search, label: 'Explore', path: '/', end: true },
     { icon: MapPin, label: 'Map View', path: '/map' },
     { icon: Flame, label: 'Trending', path: '/trending' },
     { icon: MessageCircle, label: 'Messages', path: '/messages' },
+    ...(isGuest ? [{ icon: LogIn, label: 'Log In', path: '/login' }] : []),
     { icon: Menu, label: 'My Menu', path: '/menu' },
   ];
 
