@@ -261,8 +261,10 @@ export default function ListBusiness() {
         </div>
         {step === 2 && (
           <button 
+            type="button"
             onClick={handleSubmit}
-            className="bg-[#CD1C18] hover:bg-[#9B1313] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md transition"
+            disabled={!imageFile || !formData.phone || formData.phone.length < 9}
+            className="bg-[#CD1C18] hover:bg-[#9B1313] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save size={16} /> Save
           </button>

@@ -15,6 +15,7 @@ import SavedListings from './features/explore/SavedListings.jsx';
 import MyPlans from './features/explore/MyPlans.jsx';
 import ManageListings from './features/vendor/ManageListings.jsx';
 import AdminPanel from './features/vendor/AdminPanel.jsx';
+import OnboardingGate from './components/OnboardingGate.jsx';
 
 const router = createBrowserRouter([
   {
@@ -27,45 +28,51 @@ const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <App />,
+    element: <OnboardingGate />,
     children: [
       {
         path: '/',
-        element: <Explore />,
+        element: <App />,
+        children: [
+          {
+            path: '/',
+            element: <Explore />,
+          },
+          {
+            path: '/map',
+            element: <MapView />,
+          },
+          {
+            path: '/trending',
+            element: <Trending />,
+          },
+          {
+            path: '/messages',
+            element: <Messages />,
+          },
+          {
+            path: '/menu',
+            element: <UserMenu />,
+          },
+        ],
       },
       {
-        path: '/map',
-        element: <MapView />,
+        path: '/list-business',
+        element: <ListBusiness />,
       },
       {
-        path: '/trending',
-        element: <Trending />,
+        path: '/dashboard/saved',
+        element: <SavedListings />,
       },
       {
-        path: '/messages',
-        element: <Messages />,
+        path: '/dashboard/plans',
+        element: <MyPlans />,
       },
       {
-        path: '/menu',
-        element: <UserMenu />,
-      },
-    ],
-  },
-  {
-    path: '/list-business',
-    element: <ListBusiness />,
-  },
-  {
-    path: '/dashboard/saved',
-    element: <SavedListings />,
-  },
-  {
-    path: '/dashboard/plans',
-    element: <MyPlans />,
-  },
-  {
-    path: '/dashboard/manage',
-    element: <ManageListings />,
+        path: '/dashboard/manage',
+        element: <ManageListings />,
+      }
+    ]
   },
   {
     path: '/admin',

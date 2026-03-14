@@ -40,22 +40,30 @@ export const AuthProvider = ({ children }) => {
           const userSnap = await getDoc(userRef);
           
           if (!userSnap.exists()) {
-            // Create initial profile for new anonymous users
-            const initialProfile = {
-              uid: firebaseUser.uid,
-              displayName: firebaseUser.isAnonymous ? 'Anonymous Guest' : (firebaseUser.displayName || 'User'),
-              createdAt: new Date().toISOString(),
-              savedListings: [], // array of business IDs
-              isAdmin: false // for future admin panel rules
-            };
-            await setDoc(userRef, initialProfile);
-            setUserProfile(initialProfile);
+            if (firebaseUser.isAnonymous) {
+              // Create initial profile for anonymous users
+              const initialProfile = {
+                uid: firebaseUser.uid,
+                displayName: 'Anonymous Guest',
+                createdAt: new Date().toISOString(),
+                savedListings: [],
+                isAdmin: false
+              };
+              await setDoc(userRef, initialProfile);
+              setUserProfile(initialProfile);
+            } else {
+              // Require onboarding for new registered users
+              setUserProfile({
+                needsOnboarding: true,
+                uid: firebaseUser.uid,
+                phone: firebaseUser.phoneNumber || ''
+              });
+            }
           } else {
             setUserProfile(userSnap.data());
-          }
-          
-          if (!firebaseUser.isAnonymous) {
-            requestNotificationPermission(firebaseUser.uid);
+            if (!firebaseUser.isAnonymous) {
+              requestNotificationPermission(firebaseUser.uid);
+            }
           }
         } catch (error) {
           console.warn("Firestore offline. Using fallback auth profile.", error);
@@ -88,7 +96,7 @@ export const AuthProvider = ({ children }) => {
   const isGuest = !user || user.isAnonymous === true;
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, isGuest }}>
+    <AuthContext.Provider value={{ user, userProfile, setUserProfile, loading, isGuest }}>
       {!loading && children}
     </AuthContext.Provider>
   );
