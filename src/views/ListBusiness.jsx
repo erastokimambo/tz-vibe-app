@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2, GlassWater, Music, CalendarHeart, Utensils } from 'lucide-react';
 import { db } from '../firebase/config';
 import { collection, addDoc } from 'firebase/firestore';
 
 export default function ListBusiness() {
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
     category: 'Bars & Clubs',
@@ -90,22 +91,36 @@ export default function ListBusiness() {
     }
   };
 
+  const availableCategories = [
+    { id: 'Bars & Clubs', icon: GlassWater, desc: 'Lounges, Nightclubs, Speakeasies', color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { id: 'DJs', icon: Music, desc: 'Solo Performers, VJs, Sound Engineers', color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { id: 'Wedding Venues', icon: CalendarHeart, desc: 'Halls, Gardens, Resorts', color: 'text-pink-500', bg: 'bg-pink-500/10' },
+    { id: 'Restaurants', icon: Utensils, desc: 'Cafes, Fine Dining, Eateries', color: 'text-orange-500', bg: 'bg-orange-500/10' },
+  ];
+
+  const handleCategorySelect = (categoryId) => {
+    setFormData(prev => ({ ...prev, category: categoryId }));
+    setStep(2);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#38000A] pb-24">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white/90 dark:bg-[#38000A]/90 backdrop-blur-lg px-4 pt-12 pb-4 border-b dark:border-gray-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-gray-900 dark:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          <button onClick={() => step === 2 ? setStep(1) : navigate(-1)} className="p-2 -ml-2 text-gray-900 dark:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-2xl font-bold text-[#CD1C18] dark:text-[#FFA896]">Record Data</h1>
+          <h1 className="text-xl font-bold text-[#CD1C18] dark:text-[#FFA896]">{step === 1 ? 'Select Category' : 'Record Data'}</h1>
         </div>
-        <button 
-          onClick={handleSubmit}
-          className="bg-[#CD1C18] hover:bg-[#9B1313] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md transition"
-        >
-          <Save size={16} /> Save
-        </button>
+        {step === 2 && (
+          <button 
+            onClick={handleSubmit}
+            className="bg-[#CD1C18] hover:bg-[#9B1313] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md transition"
+          >
+            <Save size={16} /> Save
+          </button>
+        )}
       </div>
 
       {toast && (
@@ -114,9 +129,52 @@ export default function ListBusiness() {
         </div>
       )}
 
-      {/* Form Context */}
-      <form onSubmit={handleSubmit} className="p-4 max-w-2xl mx-auto space-y-6">
-        
+      {step === 1 ? (
+        <div className="p-4 max-w-2xl mx-auto space-y-4 pt-8">
+          <p className="text-gray-500 dark:text-gray-400 font-medium mb-6">Choose the type of business or entity you are listing. The form will adapt to your choice.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4">
+            {availableCategories.map(cat => (
+              <button 
+                key={cat.id}
+                onClick={() => handleCategorySelect(cat.id)}
+                className="flex items-center gap-4 bg-white/50 dark:bg-[#4a0d13] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60 hover:border-[#CD1C18] dark:hover:border-[#CD1C18]/50 transition-colors text-left group"
+              >
+                <div className={`p-4 rounded-2xl ${cat.bg} ${cat.color} group-hover:scale-110 transition-transform`}>
+                  <cat.icon size={28} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black dark:text-white">{cat.id}</h3>
+                  <p className="text-sm font-medium text-gray-400 dark:text-gray-500">{cat.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+      <form onSubmit={handleSubmit} className="p-4 max-w-2xl mx-auto space-y-6 animate-in fade-in slide-in-from-right-8">
+        {/* Selected Category Banner */}
+        <div className="flex items-center justify-between bg-white/50 dark:bg-[#4a0d13] p-4 rounded-2xl border border-gray-100 dark:border-gray-800/60 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#CD1C18]/10 rounded-lg text-[#CD1C18] dark:text-[#FFA896]">
+              {(() => {
+                const Icon = availableCategories.find(c => c.id === formData.category)?.icon || Plus;
+                return <Icon size={20} />;
+              })()}
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest leading-tight">Selected Category</p>
+              <h2 className="text-lg font-black dark:text-white leading-tight">{formData.category}</h2>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onClick={() => setStep(1)}
+            className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-white bg-gray-100 dark:bg-gray-800 rounded-xl transition-colors"
+          >
+            Change
+          </button>
+        </div>
+
         {/* Basic Info Container */}
         <div className="bg-white/50 dark:bg-[#4a0d13] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800/60 space-y-6">
           <h2 className="text-xl font-black tracking-tight mb-2 dark:text-white border-b border-gray-100 dark:border-gray-800/50 pb-4">Basic Details</h2>
@@ -125,35 +183,22 @@ export default function ListBusiness() {
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Business Name</label>
             <input 
               required type="text" name="name" value={formData.name} onChange={handleChange}
-              placeholder="e.g. Elements Club"
+              placeholder={formData.category === 'DJs' ? 'e.g. DJ Snake' : 'e.g. Elements Club'}
               className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium text-lg"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Category</label>
-              <select 
-                name="category" value={formData.category} onChange={handleChange}
-                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium"
-              >
-                <option>Bars & Clubs</option>
-                <option>DJs</option>
-                <option>Wedding Venues</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Price Range</label>
-              <select 
-                name="priceRange" value={formData.priceRange} onChange={handleChange}
-                className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium text-center"
-              >
-                <option>$</option>
-                <option>$$</option>
-                <option>$$$</option>
-                <option>$$$$</option>
-              </select>
-            </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Price Range</label>
+            <select 
+              name="priceRange" value={formData.priceRange} onChange={handleChange}
+              className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] appearance-none font-medium text-center"
+            >
+              <option>$</option>
+              <option>$$</option>
+              <option>$$$</option>
+              <option>$$$$</option>
+            </select>
           </div>
 
           <div>
@@ -211,14 +256,16 @@ export default function ListBusiness() {
               />
             </div>
           </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Menu Link URL (Optional)</label>
-            <input 
-              type="url" name="menuUrl" value={formData.menuUrl} onChange={handleChange}
-              placeholder="https://..."
-              className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis"
-            />
-          </div>
+          {(formData.category === 'Bars & Clubs' || formData.category === 'Restaurants') && (
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Menu Link URL (Optional)</label>
+              <input 
+                type="url" name="menuUrl" value={formData.menuUrl} onChange={handleChange}
+                placeholder="https://..."
+                className="w-full bg-transparent border-b-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2 outline-none focus:border-[#CD1C18] transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis"
+              />
+            </div>
+          )}
         </div>
 
         {/* Mock Analytics properties */}
@@ -307,6 +354,7 @@ export default function ListBusiness() {
         </div>
 
       </form>
+      )}
     </div>
   );
 }
