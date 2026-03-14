@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Edit3, Trash2, CalendarCheck, Check, Clock } from 'lucide-react';
+import { ArrowLeft, Edit3, Trash2, CalendarCheck, Check, Clock, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../services/config";
@@ -11,6 +11,8 @@ export default function ManageListings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingBookings, setLoadingBookings] = useState(true);
+  const [decliningId, setDecliningId] = useState(null);
+  const [declineReason, setDeclineReason] = useState('');
 
   useEffect(() => {
     if (!userProfile?.uid) {
@@ -55,9 +57,16 @@ export default function ManageListings() {
     }
   };
 
-  const updateBookingStatus = async (id, newStatus) => {
+  const updateBookingStatus = async (id, newStatus, reason = null) => {
     try {
-      await updateDoc(doc(db, 'bookings', id), { status: newStatus });
+      const updateData = { status: newStatus };
+      if (reason) updateData.declineReason = reason;
+      await updateDoc(doc(db, 'bookings', id), updateData);
+      
+      if (newStatus === 'declined') {
+        setDecliningId(null);
+        setDeclineReason('');
+      }
     } catch (err) {
       console.error("Error updating booking status:", err);
     }
@@ -102,15 +111,31 @@ export default function ManageListings() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-4">
-                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Party of {book.pax}</span>
+                    <div>
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 block">Party of {book.pax}</span>
+                      {book.bookingDate && book.bookingTime && (
+                        <span className="text-xs text-gray-500 font-medium">
+                          <Clock size={12} className="inline mr-1" />
+                          {book.bookingDate} at {book.bookingTime}
+                        </span>
+                      )}
+                    </div>
                     <div className="flex gap-2">
                       {book.status === 'pending' && (
-                        <button 
-                          onClick={() => updateBookingStatus(book.id, 'confirmed')}
-                          className="px-3 py-1.5 bg-black dark:bg-gray-700 text-white text-xs font-bold flex items-center gap-1 rounded-lg"
-                        >
-                          <Check size={14} /> Confirm
-                        </button>
+                        <>
+                          <button 
+                            onClick={() => updateBookingStatus(book.id, 'confirmed')}
+                            className="px-3 py-1.5 bg-black dark:bg-gray-700 text-white text-xs font-bold flex items-center gap-1 rounded-lg"
+                          >
+                            <Check size={14} /> Confirm
+                          </button>
+                          <button 
+                            onClick={() => setDecliningId(book.id)}
+                            className="px-3 py-1.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold flex items-center gap-1 rounded-lg transition"
+                          >
+                            <X size={14} /> Decline
+                          </button>
+                        </>
                       )}
                       {(book.status === 'pending' || book.status === 'confirmed') && (
                         <button 
@@ -122,6 +147,28 @@ export default function ManageListings() {
                       )}
                     </div>
                   </div>
+
+                  {/* Decline Reason Input */}
+                  {decliningId === book.id && (
+                    <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30 animate-in fade-in slide-in-from-top-2">
+                      <label className="block text-xs font-bold text-red-700 dark:text-red-400 mb-2">Reason for Declining</label>
+                      <input 
+                        type="text"
+                        value={declineReason}
+                        onChange={(e) => setDeclineReason(e.target.value)}
+                        placeholder="e.g. Fully booked tonight"
+                        className="w-full bg-white dark:bg-gray-900 border border-red-200 dark:border-red-800 text-sm py-2 px-3 rounded-lg mb-2 outline-none focus:ring-1 focus:ring-red-500 text-gray-900 dark:text-white"
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <button onClick={() => setDecliningId(null)} className="text-xs font-bold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 px-3 py-1.5 transition">Cancel</button>
+                        <button 
+                          onClick={() => updateBookingStatus(book.id, 'declined', declineReason)}
+                          disabled={!declineReason.trim()}
+                          className="text-xs font-bold bg-[#CD1C18] text-white px-3 py-1.5 rounded-lg disabled:opacity-50 transition"
+                        >Confirm Decline</button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

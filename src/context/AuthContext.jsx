@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db } from "../services/config";
+import { auth, db, messaging } from "../services/config";
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { getToken } from 'firebase/messaging';
 
 const AuthContext = createContext();
 
@@ -11,6 +12,21 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const requestNotificationPermission = async (uid) => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        const token = await getToken(messaging);
+        if (token) {
+          const userRef = doc(db, 'users', uid);
+          await updateDoc(userRef, { fcmToken: token });
+        }
+      }
+    } catch (error) {
+      console.log("FCM Token fetch failed:", error);
+    }
+  };
 
   useEffect(() => {
     // Listen for Firebase Auth state changes
@@ -36,6 +52,10 @@ export const AuthProvider = ({ children }) => {
             setUserProfile(initialProfile);
           } else {
             setUserProfile(userSnap.data());
+          }
+          
+          if (!firebaseUser.isAnonymous) {
+            requestNotificationPermission(firebaseUser.uid);
           }
         } catch (error) {
           console.warn("Firestore offline. Using fallback auth profile.", error);

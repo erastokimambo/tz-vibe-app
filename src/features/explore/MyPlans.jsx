@@ -33,6 +33,7 @@ export default function MyPlans() {
     switch (status) {
       case 'confirmed': return 'text-green-500 bg-green-50 dark:bg-green-900/20 border-green-200';
       case 'checked-in': return 'text-purple-500 bg-purple-50 dark:bg-purple-900/20 border-purple-200';
+      case 'declined': return 'text-red-500 bg-red-50 dark:bg-red-900/20 border-red-200';
       default: return 'text-orange-500 bg-orange-50 dark:bg-orange-900/20 border-orange-200';
     }
   };
@@ -56,7 +57,9 @@ export default function MyPlans() {
                 <div>
                   <h3 className="font-black text-lg dark:text-white leading-tight">{plan.businessName}</h3>
                   <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">
-                     {plan.timestamp?.toDate().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                     {plan.bookingDate && plan.bookingTime 
+                       ? `${plan.bookingDate} at ${plan.bookingTime}` 
+                       : plan.timestamp?.toDate().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                   </p>
                 </div>
                 <div className={`px-3 py-1 rounded-full border text-xs font-black uppercase tracking-widest ${getStatusColor(plan.status)}`}>
@@ -68,6 +71,13 @@ export default function MyPlans() {
                   Party of {plan.pax}
                 </div>
               </div>
+
+              {plan.status === 'declined' && plan.declineReason && (
+                <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30 text-sm font-medium text-red-700 dark:text-red-400 animate-in fade-in slide-in-from-top-2">
+                  <span className="font-bold uppercase text-[10px] tracking-widest block mb-1">Vendor Note</span>
+                  {plan.declineReason}
+                </div>
+              )}
             </div>
           ))
         ) : (

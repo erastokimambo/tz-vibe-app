@@ -15,9 +15,10 @@ export default function BusinessDetailModal({ business, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
-  // Booking State
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingPax, setBookingPax] = useState(2);
+  const [bookingDate, setBookingDate] = useState('');
+  const [bookingTime, setBookingTime] = useState('');
   const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
 
   // Prevent scrolling on root when modal is open
@@ -138,6 +139,10 @@ export default function BusinessDetailModal({ business, onClose }) {
       setIsAuthModalOpen(true);
       return;
     }
+    if (!bookingDate || !bookingTime) {
+      alert("Please select both a date and a time for your booking.");
+      return;
+    }
 
     setIsBookingSubmitting(true);
     try {
@@ -149,6 +154,8 @@ export default function BusinessDetailModal({ business, onClose }) {
         userPhone: userProfile.phone || "",
         businessName: business.name,
         pax: bookingPax,
+        bookingDate,
+        bookingTime,
         status: 'pending',
         timestamp: serverTimestamp()
       });
@@ -377,6 +384,29 @@ export default function BusinessDetailModal({ business, onClose }) {
               </button>
             </div>
             
+            <div className="mb-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Date</label>
+                <input 
+                  type="date"
+                  required
+                  value={bookingDate}
+                  onChange={(e) => setBookingDate(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] font-bold"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Time</label>
+                <input 
+                  type="time"
+                  required
+                  value={bookingTime}
+                  onChange={(e) => setBookingTime(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] font-bold"
+                />
+              </div>
+            </div>
+
             <div className="mb-8">
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">Party Size (Pax)</label>
               <div className="flex items-center justify-center gap-6">
