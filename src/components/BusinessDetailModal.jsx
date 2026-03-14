@@ -63,8 +63,32 @@ export default function BusinessDetailModal({ business, onClose }) {
         });
       }
     } catch (error) {
-      console.log('Error sharing:', error);
+      console.error('Error sharing:', error);
     }
+  };
+
+  // Deep Link Logic for Ridesharing
+  const getRideLink = () => {
+    // Check the raw legacy location first (which holds Region names like 'Arusha')
+    const region = business.location?.toLowerCase() || '';
+    
+    if (region.includes('arusha')) {
+       // InDrive expects address text
+       return `indrive://search?addr=${encodeURIComponent(business.logistics?.addressString || business.location || business.name)}`;
+    }
+    if (region.includes('dar es salaam') || region.includes('dar')) {
+       // Bolt prefers coordinates if available, fallback to search
+       if (business.logistics?.coordinates) {
+         return `bolt://request?dest_lat=${business.logistics.coordinates.lat}&dest_lng=${business.logistics.coordinates.lng}`;
+       }
+       return `bolt://request?dest_lat=&dest_lng=&destination_name=${encodeURIComponent(business.logistics?.addressString || business.location || business.name)}`;
+    }
+    
+    // Fallback native Google Maps link
+    if (business.logistics?.coordinates) {
+      return `https://maps.google.com/?q=${business.logistics.coordinates.lat},${business.logistics.coordinates.lng}`;
+    }
+    return `https://maps.google.com/?q=${encodeURIComponent(business.logistics?.addressString || business.location || business.name)}`;
   };
 
   const toggleSave = async () => {
@@ -284,9 +308,12 @@ export default function BusinessDetailModal({ business, onClose }) {
           >
             Book Table
           </button>
-          <button className="flex-1 py-3.5 bg-[#CD1C18] hover:bg-[#9B1313] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition">
+          <a 
+            href={getRideLink()}
+            className="flex-1 py-3.5 bg-[#CD1C18] hover:bg-[#9B1313] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition"
+          >
             <Navigation size={18} /> Ride
-          </button>
+          </a>
         </div>
       </div>
       </div>
