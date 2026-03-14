@@ -59,7 +59,7 @@ export default function UserMenu() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      navigate('/login');
+      navigate('/');
     } catch (error) {
        console.error("Failed to sign out:", error);
     }
