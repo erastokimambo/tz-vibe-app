@@ -21,6 +21,21 @@ export default function BusinessDetailModal({ business, onClose }) {
   const [bookingTime, setBookingTime] = useState('');
   const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
 
+  // Quote State
+  const [isQuoteOpen, setIsQuoteOpen] = useState(false);
+  const [quoteDate, setQuoteDate] = useState('');
+  const [quoteDuration, setQuoteDuration] = useState('4');
+  const [quoteCategory, setQuoteCategory] = useState('Wedding');
+  const [equipmentNeeded, setEquipmentNeeded] = useState('venue_has_sound');
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [isQuoteSubmitting, setIsQuoteSubmitting] = useState(false);
+  
+  const availableGenres = ['Amapiano', 'Afrobeats', 'Hip-Hop', 'House', 'Bongo Flava', 'R&B'];
+
+  const toggleGenre = (genre) => {
+    setSelectedGenres(prev => prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]);
+  };
+
   // Prevent scrolling on root when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -166,6 +181,58 @@ export default function BusinessDetailModal({ business, onClose }) {
       alert("Something went wrong requesting your booking. Please try again.");
     } finally {
       setIsBookingSubmitting(false);
+    }
+  };
+
+  const handleQuoteRequest = async () => {
+    if (isGuest || !userProfile) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    if (!quoteDate) {
+      alert("Please select a date for your event.");
+      return;
+    }
+    
+    setIsQuoteSubmitting(true);
+    try {
+      await addDoc(collection(db, 'bookings'), {
+        bookingType: 'quote',
+        vendorId: business.id,
+        ownerId: business.ownerId || 'anonymous',
+        userId: userProfile.uid,
+        userName: userProfile.displayName || "Anonymous VIP",
+        userPhone: userProfile.phone || "",
+        businessName: business.name,
+        bookingDate: quoteDate,
+        duration: quoteDuration,
+        eventCategory: quoteCategory,
+        equipmentNeeded: equipmentNeeded,
+        genres: selectedGenres,
+        status: 'pending',
+        timestamp: serverTimestamp()
+      });
+      
+      setIsQuoteOpen(false);
+      
+      // WhatsApp Sync Trigger
+      const vendorPhone = business.phone ? business.phone.replace(/[^0-9]/g, '') : '';
+      if (vendorPhone) {
+        const equipLabel = equipmentNeeded === 'dj_must_provide' ? 'DJ must provide sound equipment' : 'Venue has sound system';
+        const text = `Hi ${name}, I'd like a quote for a ${quoteDuration}-hour ${quoteCategory} on ${quoteDate}.\nGenres: ${selectedGenres.join(', ') || 'Any'}.\nEquipment: ${equipLabel}.\n\nSent via TzVibe.`;
+        const waLink = `https://wa.me/${vendorPhone}?text=${encodeURIComponent(text)}`;
+        if (confirm(`Quote requested successfully! Would you like to message the DJ directly on WhatsApp with this request?`)) {
+          window.open(waLink, '_blank');
+        }
+      } else {
+         alert("Quote requested successfully! The DJ will respond to you shortly via TzVibe or WhatsApp.");
+      }
+      
+    } catch (error) {
+      console.error("Error creating quote: ", error);
+      alert("Something went wrong requesting your quote. Please try again.");
+    } finally {
+      setIsQuoteSubmitting(false);
     }
   };
 
@@ -354,12 +421,23 @@ export default function BusinessDetailModal({ business, onClose }) {
           >
             <MessageCircle size={22} />
           </button>
-          <button 
-            onClick={() => setIsBookingOpen(true)}
-            className="flex-1 py-3.5 bg-black dark:bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition"
-          >
-            Book Table
-          </button>
+          
+          {business.category === 'DJs' ? (
+            <button 
+              onClick={() => setIsQuoteOpen(true)}
+              className="flex-1 py-3.5 bg-black dark:bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition"
+            >
+              Request Quote
+            </button>
+          ) : (
+            <button 
+              onClick={() => setIsBookingOpen(true)}
+              className="flex-1 py-3.5 bg-black dark:bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition"
+            >
+              Book Table
+            </button>
+          )}
+
           <a 
             href={getRideLink()}
             className="flex-1 py-3.5 bg-[#CD1C18] hover:bg-[#9B1313] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition"
@@ -436,6 +514,109 @@ export default function BusinessDetailModal({ business, onClose }) {
                 'Request VIP Table'
               )}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Quote Sub-Modal Overlay */}
+      {isQuoteOpen && (
+        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 pb-0">
+          <div className="bg-white dark:bg-[#4a0d13] w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center border-b dark:border-gray-800 p-6 pb-4 shrink-0">
+              <div>
+                <h3 className="text-xl font-black dark:text-white">Request Quote</h3>
+                <p className="text-sm font-bold text-[#CD1C18]">{business.name}</p>
+              </div>
+              <button onClick={() => setIsQuoteOpen(false)} className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500 hover:bg-gray-200 transition">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto w-full">
+              <div className="space-y-6 mb-8">
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Event Date</label>
+                    <input 
+                      type="date" required value={quoteDate} onChange={(e) => setQuoteDate(e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] font-bold"
+                    />
+                  </div>
+                  <div className="w-1/3">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Hours</label>
+                    <select 
+                      value={quoteDuration} onChange={(e) => setQuoteDuration(e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] font-bold appearance-none text-center"
+                    >
+                      {[1,2,3,4,5,6,8,12].map(h => <option key={h} value={h}>{h}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Event Type</label>
+                  <select 
+                    value={quoteCategory} onChange={(e) => setQuoteCategory(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-[#38000A] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#CD1C18] font-bold"
+                  >
+                    <option>Wedding</option>
+                    <option>Club / Bar Set</option>
+                    <option>Private Party</option>
+                    <option>Corporate Event</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Equipment Required?</label>
+                  <div className="flex gap-4">
+                    <label className={`flex-1 flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-colors bg-gray-50 dark:bg-[#38000A] text-gray-900 dark:text-white ${equipmentNeeded === 'venue_has_sound' ? 'border-[#CD1C18]' : 'border-transparent'}`}>
+                      <input type="radio" name="equipment" value="venue_has_sound" checked={equipmentNeeded === 'venue_has_sound'} onChange={(e) => setEquipmentNeeded(e.target.value)} className="accent-[#CD1C18] w-4 h-4" />
+                      <span className="text-sm font-bold leading-tight">Venue has sound</span>
+                    </label>
+                    <label className={`flex-1 flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-colors bg-gray-50 dark:bg-[#38000A] text-gray-900 dark:text-white ${equipmentNeeded === 'dj_must_provide' ? 'border-[#CD1C18]' : 'border-transparent'}`}>
+                      <input type="radio" name="equipment" value="dj_must_provide" checked={equipmentNeeded === 'dj_must_provide'} onChange={(e) => setEquipmentNeeded(e.target.value)} className="accent-[#CD1C18] w-4 h-4" />
+                      <span className="text-sm font-bold leading-tight">DJ must provide</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Preferred Genres</label>
+                  <div className="flex flex-wrap gap-2">
+                    {availableGenres.map(genre => (
+                      <button
+                        key={genre} type="button" onClick={() => toggleGenre(genre)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center ${
+                          selectedGenres.includes(genre)
+                            ? 'bg-[#CD1C18] text-white shadow-md' 
+                            : 'bg-white dark:bg-white/5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-[#CD1C18]'
+                        }`}
+                      >
+                        {genre}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pb-safe">
+                <button 
+                  onClick={handleQuoteRequest}
+                  disabled={isQuoteSubmitting || !quoteDate}
+                  className="w-full py-4 bg-[#CD1C18] hover:bg-[#9B1313] disabled:bg-gray-400 text-white rounded-2xl font-black text-lg shadow-lg flex items-center justify-center gap-2 transition"
+                >
+                  {isQuoteSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    'Send Request'
+                  )}
+                </button>
+                <p className="text-center text-xs text-gray-500 mt-3 font-medium">After submitting, you can instantly message the DJ on WhatsApp to discuss details.</p>
+              </div>
+            </div>
           </div>
         </div>
       )}

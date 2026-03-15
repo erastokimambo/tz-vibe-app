@@ -112,23 +112,43 @@ export default function ManageListings() {
                   </div>
                   <div className="flex items-center justify-between mt-4">
                     <div>
-                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 block">Party of {book.pax}</span>
-                      {book.bookingDate && book.bookingTime && (
-                        <span className="text-xs text-gray-500 font-medium">
-                          <Clock size={12} className="inline mr-1" />
-                          {book.bookingDate} at {book.bookingTime}
-                        </span>
+                      {book.bookingType === 'quote' ? (
+                        <>
+                          <span className="text-sm font-bold text-gray-700 dark:text-gray-300 block">{book.bookingDate} | {book.duration} Hours</span>
+                          <span className="text-xs text-gray-500 font-medium block mt-1">Event: <span className="font-bold">{book.eventCategory}</span></span>
+                          {book.genres && book.genres.length > 0 && <span className="text-xs text-gray-500 font-medium block">Genre: {book.genres.join(', ')}</span>}
+                          <span className="text-xs text-[#CD1C18] dark:text-[#FFA896] font-bold block mt-1">Equip: {book.equipmentNeeded === 'dj_must_provide' ? 'DJ Must Provide' : 'Venue Has Sound'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-sm font-bold text-gray-700 dark:text-gray-300 block">Party of {book.pax}</span>
+                          {book.bookingDate && book.bookingTime && (
+                            <span className="text-xs text-gray-500 font-medium">
+                              <Clock size={12} className="inline mr-1" />
+                              {book.bookingDate} at {book.bookingTime}
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                     <div className="flex gap-2">
                       {book.status === 'pending' && (
                         <>
-                          <button 
-                            onClick={() => updateBookingStatus(book.id, 'confirmed')}
-                            className="px-3 py-1.5 bg-black dark:bg-gray-700 text-white text-xs font-bold flex items-center gap-1 rounded-lg"
-                          >
-                            <Check size={14} /> Confirm
-                          </button>
+                          {book.bookingType === 'quote' ? (
+                            <button 
+                              onClick={() => updateBookingStatus(book.id, 'confirmed')}
+                              className="px-3 py-1.5 bg-black dark:bg-gray-700 text-white text-xs font-bold flex items-center gap-1 rounded-lg"
+                            >
+                              <Check size={14} /> Accept & Send Quote
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => updateBookingStatus(book.id, 'confirmed')}
+                              className="px-3 py-1.5 bg-black dark:bg-gray-700 text-white text-xs font-bold flex items-center gap-1 rounded-lg"
+                            >
+                              <Check size={14} /> Confirm
+                            </button>
+                          )}
                           <button 
                             onClick={() => setDecliningId(book.id)}
                             className="px-3 py-1.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold flex items-center gap-1 rounded-lg transition"
@@ -137,7 +157,7 @@ export default function ManageListings() {
                           </button>
                         </>
                       )}
-                      {(book.status === 'pending' || book.status === 'confirmed') && (
+                      {(book.status === 'pending' || book.status === 'confirmed') && (book.bookingType !== 'quote') &&(
                         <button 
                           onClick={() => updateBookingStatus(book.id, 'checked-in')}
                           className="px-3 py-1.5 bg-[#CD1C18] text-white text-xs font-bold flex items-center gap-1 rounded-lg"
