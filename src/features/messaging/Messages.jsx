@@ -56,7 +56,7 @@ export default function Messages() {
             placeholder="Search chats..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-2 pl-10 pr-4 outline-none focus:ring-2 focus:ring-[#CD1C18]"
+            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl py-2 pl-10 pr-4 outline-none focus:ring-2 focus:ring-[#CD1C18] text-base"
           />
         </div>
       </div>
