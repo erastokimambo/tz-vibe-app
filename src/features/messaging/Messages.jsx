@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ChatInterface from "../../components/ChatInterface";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../services/config";
@@ -7,6 +8,8 @@ import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestor
 
 export default function Messages() {
   const { userProfile } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeChat, setActiveChat] = useState(null);
   const [chats, setChats] = useState([]);
@@ -37,6 +40,16 @@ export default function Messages() {
 
     return () => unsubscribe();
   }, [userProfile]);
+
+  useEffect(() => {
+    if (location.state?.openChatId && chats.length > 0) {
+      const target = chats.find(c => c.id === location.state.openChatId);
+      if (target) {
+        setActiveChat(target);
+        navigate(location.pathname, { replace: true, state: {} });
+      }
+    }
+  }, [location.state, chats, navigate, location.pathname]);
 
   const filteredChats = chats.filter(chat => 
     chat.businessName?.toLowerCase().includes(searchQuery.toLowerCase()) || 

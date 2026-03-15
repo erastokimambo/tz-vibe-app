@@ -267,7 +267,7 @@ export default function BusinessDetailModal({ business, onClose }) {
       
       // Navigate to the inbox tab where the context will be open
       onClose();
-      navigate('/messages');
+      navigate('/messages', { state: { openChatId: chatId } });
       
     } catch (error) {
       console.error("Error initializing chat", error);
@@ -422,7 +422,7 @@ export default function BusinessDetailModal({ business, onClose }) {
             <MessageCircle size={22} />
           </button>
           
-          {business.category === 'DJs' ? (
+          {business.category?.toLowerCase().includes('dj') ? (
             <button 
               onClick={() => setIsQuoteOpen(true)}
               className="flex-1 py-3.5 bg-black dark:bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition"
