@@ -1,4 +1,4 @@
-import { Search, MapPin, MessageCircle, Menu, Flame, LogIn } from 'lucide-react';
+import { Search, MapPin, MessageCircle, Menu, Flame, LogIn, Info } from 'lucide-react';
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 
@@ -10,6 +10,7 @@ export default function TopNav() {
     { icon: MapPin, label: 'Map View', path: '/map' },
     { icon: Flame, label: 'Trending', path: '/trending' },
     { icon: MessageCircle, label: 'Messages', path: '/messages' },
+    { icon: Info, label: 'About', path: '/about' },
     ...(isGuest ? [{ icon: LogIn, label: 'Log In', path: '/login' }] : []),
     { icon: Menu, label: 'Profile', path: '/menu', isProfile: true },
   ];

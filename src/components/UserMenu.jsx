@@ -1,4 +1,4 @@
-import { User, Heart, Calendar, PlusSquare, Settings, LogOut, LogIn, ShieldCheck, X, Check } from 'lucide-react';
+import { User, Heart, Calendar, PlusSquare, Settings, LogOut, LogIn, ShieldCheck, X, Check, Info, Mail } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 import { useState } from 'react';
@@ -28,6 +28,13 @@ export default function UserMenu() {
       items: [
         { icon: PlusSquare, label: "Record Data / List Business", bg: "bg-green-500", link: "/list-business" },
         { icon: Settings, label: "Manage Listings", bg: "bg-gray-600", link: "/dashboard/manage" },
+      ]
+    },
+    {
+      title: "Support",
+      items: [
+        { icon: Info, label: "About TzVibe", bg: "bg-[#CD1C18]", link: "/about" },
+        { icon: Mail, label: "Contact Us", bg: "bg-orange-500", link: "/about" },
       ]
     },
     ...(userProfile?.isAdmin ? [{
