@@ -29,6 +29,7 @@ export default function BusinessDetailModal({ business, onClose }) {
   const [equipmentNeeded, setEquipmentNeeded] = useState('venue_has_sound');
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [isQuoteSubmitting, setIsQuoteSubmitting] = useState(false);
+  const [isReviewInputVisible, setIsReviewInputVisible] = useState(false);
   
   const availableGenres = ['Amapiano', 'Afrobeats', 'Hip-Hop', 'House', 'Bongo Flava', 'R&B'];
 
@@ -142,6 +143,7 @@ export default function BusinessDetailModal({ business, onClose }) {
       });
       setNewReviewText('');
       setNewReviewRating(5);
+      setIsReviewInputVisible(false); // Close the form on success
     } catch (error) {
       console.error("Error submitting review: ", error);
     } finally {
@@ -352,25 +354,66 @@ export default function BusinessDetailModal({ business, onClose }) {
 
         {/* Reviews Section Live */}
         <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Reviews & Vibes</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Reviews & Vibes</h2>
+            {business.rating > 0 && Array.isArray(reviews) && (
+              <span className="text-sm font-semibold text-gray-500 flex items-center gap-1">
+                 <Star size={14} className="fill-yellow-500 text-yellow-500" /> 
+                 {business.rating?.toFixed(1) || "5.0"} ({reviews.length})
+              </span>
+            )}
+          </div>
           
-          {/* Write Review Form */}
-          <form onSubmit={submitReview} className="mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border dark:border-gray-800">
-            <div className="flex items-center gap-1 mb-3">
-              {[1, 2, 3, 4, 5].map(star => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setNewReviewRating(star)}
-                  className="focus:outline-none transition-transform hover:scale-110"
-                >
-                  <Star size={24} className={newReviewRating >= star ? "fill-yellow-500 text-yellow-500" : "text-gray-300 dark:text-gray-600"} />
-                </button>
-              ))}
-            </div>
-            <div className="flex items-end gap-2">
-              <textarea 
-                value={newReviewText}
+          {/* Write Review Button / Form Toggle */}
+          {!isReviewInputVisible ? (
+             <button
+               type="button"
+               onClick={() => {
+                 if (isGuest || !userProfile) {
+                   setIsAuthModalOpen(true);
+                 } else {
+                   setIsReviewInputVisible(true);
+                 }
+               }}
+               className="w-full mb-6 py-3.5 px-4 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700/80 rounded-2xl flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300 font-semibold transition-all backdrop-blur-sm shadow-sm"
+             >
+               <Star size={18} className="text-gray-400 dark:text-gray-500" />
+               Leave a Vibe / Write a Review
+             </button>
+          ) : (
+            <form 
+              onSubmit={(e) => { 
+                submitReview(e); 
+                // Don't auto-close if submitting to show loading state, it closes in handle afterwards
+              }} 
+              className="mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border dark:border-gray-800 animate-in fade-in slide-in-from-top-2 duration-200"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setNewReviewRating(star)}
+                      className="focus:outline-none transition-transform hover:scale-110"
+                    >
+                      <Star size={24} className={newReviewRating >= star ? "fill-yellow-500 text-yellow-500" : "text-gray-300 dark:text-gray-600"} />
+                    </button>
+                  ))}
+                </div>
+                {!isSubmitting && (
+                  <button 
+                    type="button" 
+                    onClick={() => setIsReviewInputVisible(false)} 
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs font-bold uppercase tracking-wider"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+              <div className="flex items-end gap-2">
+                <textarea 
+                  value={newReviewText}
                 onChange={(e) => setNewReviewText(e.target.value)}
                 placeholder="Share your experience..."
                 readOnly={isSubmitting}
@@ -385,6 +428,7 @@ export default function BusinessDetailModal({ business, onClose }) {
               </button>
             </div>
           </form>
+          )}
 
           {/* Review List */}
           <div className="flex flex-col gap-4">
