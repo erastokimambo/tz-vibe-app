@@ -106,7 +106,7 @@ export default function BusinessCard({ business, onClick }) {
   };
 
   const renderButtons = () => {
-    const isDJ = category && (category.includes('DJ') || category.toLowerCase().includes('djs'));
+    const isDJ = (category && category.toLowerCase().includes('dj')) || (name && name.toLowerCase().includes('dj'));
     const isWedding = category === 'Wedding Venues';
     const hasRideLogic = location || business.logistics?.addressString || business.logistics?.coordinates;
 
