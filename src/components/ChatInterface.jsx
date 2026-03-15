@@ -69,7 +69,8 @@ export default function ChatInterface({ chat, onClose }) {
   const displayImage = isMeUser ? chat?.businessImage : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#E5DDD5] dark:bg-[#0B141A] animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-0 z-[60] flex flex-col md:items-center md:justify-center bg-[#E5DDD5] dark:bg-[#0B141A] md:bg-black/60 md:backdrop-blur-sm animate-in slide-in-from-right md:zoom-in-95 duration-300">
+      <div className="flex flex-col w-full h-full md:h-[85vh] md:max-w-2xl bg-[#E5DDD5] dark:bg-[#0B141A] md:rounded-3xl md:shadow-2xl md:overflow-hidden relative">
       {/* Header */}
       <div className="flex items-center gap-3 px-2 py-3 bg-[#075E54] dark:bg-[#1F2C34] text-white shadow-md">
         <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
@@ -147,6 +148,7 @@ export default function ChatInterface({ chat, onClose }) {
         >
           <Send size={20} className="ml-1" />
         </button>
+      </div>
       </div>
     </div>
   );
