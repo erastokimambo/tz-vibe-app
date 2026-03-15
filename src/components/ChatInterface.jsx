@@ -1,4 +1,4 @@
-import { ArrowLeft, Phone, Video, MoreVertical, Send, Smile, Paperclip } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from "../context/AuthContext";
 import { db } from "../services/config";
@@ -91,9 +91,7 @@ export default function ChatInterface({ chat, onClose }) {
         </div>
         
         <div className="flex items-center gap-1">
-          <button className="p-2 hover:bg-white/10 rounded-full"><Video size={20} /></button>
-          <button className="p-2 hover:bg-white/10 rounded-full"><Phone size={20} /></button>
-          <button className="p-2 hover:bg-white/10 rounded-full"><MoreVertical size={20} /></button>
+          {/* Top right actions hidden for MVP */}
         </div>
       </div>
 
@@ -129,17 +127,15 @@ export default function ChatInterface({ chat, onClose }) {
 
       {/* Input Area */}
       <div className="flex items-end gap-2 p-2 px-3 bg-[#f0f2f5] dark:bg-[#1F2C34] pb-safe w-full box-border pb-4">
-        <div className="flex-1 flex items-center min-h-[44px] bg-white dark:bg-[#2A3942] rounded-3xl px-2 shadow-sm">
-          <button className="p-2 text-gray-500 dark:text-gray-400"><Smile size={24} /></button>
+        <div className="flex-1 flex items-center min-h-[44px] bg-white dark:bg-[#2A3942] rounded-3xl px-4 shadow-sm">
           <input 
             type="text" 
             placeholder="Type a message..." 
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            className="flex-1 bg-transparent py-2.5 px-2 outline-none text-base text-gray-900 dark:text-white"
+            className="flex-1 bg-transparent py-2.5 outline-none text-base text-gray-900 dark:text-white"
           />
-          <button className="p-2 text-gray-500 dark:text-gray-400 -rotate-45"><Paperclip size={22} /></button>
         </div>
         <button 
           onClick={handleSend}
