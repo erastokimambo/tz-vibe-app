@@ -123,7 +123,7 @@ export default function BusinessCard({ business, onClick }) {
             onClick={(e) => handleAction(e, onClick)}
             className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 min-h-[44px] rounded-xl font-semibold transition"
           >
-            <Calendar size={18} /> Schedule
+            <Calendar size={18} /> Request Quote
           </button>
         </>
       );
