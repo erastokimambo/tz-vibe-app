@@ -23,7 +23,9 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-gray-600 dark:text-gray-300 hover:text-[#CD1C18] dark:hover:text-[#FFA896] font-medium transition-colors">Features</a>
             <a href="#how-it-works" className="text-gray-600 dark:text-gray-300 hover:text-[#CD1C18] dark:hover:text-[#FFA896] font-medium transition-colors">How it Works</a>
+            <a href="#about" className="text-gray-600 dark:text-gray-300 hover:text-[#CD1C18] dark:hover:text-[#FFA896] font-medium transition-colors">About</a>
             <a href="#business" className="text-gray-600 dark:text-gray-300 hover:text-[#CD1C18] dark:hover:text-[#FFA896] font-medium transition-colors">For Business</a>
+            <a href="#contact" className="text-gray-600 dark:text-gray-300 hover:text-[#CD1C18] dark:hover:text-[#FFA896] font-medium transition-colors">Contact</a>
             <a href="/login" className="bg-[#CD1C18] hover:bg-[#9B1313] text-white px-6 py-2.5 rounded-full font-bold transition-all hover:scale-105 shadow-lg shadow-[#CD1C18]/30 inline-block">
               Launch App
             </a>
@@ -45,11 +47,13 @@ export default function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-white dark:bg-[#38000A] border-b border-gray-200 dark:border-gray-800">
           <div className="px-4 pt-2 pb-6 space-y-2">
-            <a href="#features" className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">Features</a>
-            <a href="#how-it-works" className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">How it Works</a>
-            <a href="#business" className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">For Business</a>
+            <a href="#features" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">Features</a>
+            <a href="#how-it-works" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">How it Works</a>
+            <a href="#about" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">About</a>
+            <a href="#business" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">For Business</a>
+            <a href="#contact" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-lg font-medium text-gray-900 dark:text-white hover:text-[#CD1C18] dark:hover:text-[#FFA896]">Contact</a>
             <div className="pt-4">
-              <a href="/" className="block text-center w-full bg-[#CD1C18] text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg">
+              <a href="/login" className="block text-center w-full bg-[#CD1C18] text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg">
                 Launch App
               </a>
             </div>

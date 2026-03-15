@@ -131,7 +131,7 @@ export default function Landing() {
         </section>
 
         {/* 4. ABOUT US SECTION */}
-        <section className="py-24 px-6 relative bg-gradient-to-b from-[#38000A] to-[#1a0005]">
+        <section id="about" className="py-24 px-6 relative bg-gradient-to-b from-[#38000A] to-[#1a0005]">
           <div className="max-w-4xl mx-auto text-center space-y-16">
             <div className="space-y-6">
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">The Pulse of Tanzania Nightlife</h2>
@@ -169,7 +169,7 @@ export default function Landing() {
         </section>
 
         {/* 5. CONTACT SECTION */}
-        <section className="py-24 px-6 bg-[#1a0005]">
+        <section id="contact" className="py-24 px-6 bg-[#1a0005]">
           <div className="max-w-4xl mx-auto space-y-12">
             <h2 className="text-3xl md:text-4xl font-black text-white text-center tracking-tight">Get in Touch</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
