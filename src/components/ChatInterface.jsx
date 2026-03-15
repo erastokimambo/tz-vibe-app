@@ -128,7 +128,7 @@ export default function ChatInterface({ chat, onClose }) {
       </div>
 
       {/* Input Area */}
-      <div className="flex items-end gap-2 p-2 bg-[#f0f2f5] dark:bg-[#1F2C34] pb-safe-4">
+      <div className="flex items-end gap-2 p-2 px-3 bg-[#f0f2f5] dark:bg-[#1F2C34] pb-safe w-full box-border pb-4">
         <div className="flex-1 flex items-center min-h-[44px] bg-white dark:bg-[#2A3942] rounded-3xl px-2 shadow-sm">
           <button className="p-2 text-gray-500 dark:text-gray-400"><Smile size={24} /></button>
           <input 
